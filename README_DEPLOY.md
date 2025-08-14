@@ -68,9 +68,9 @@ Ensure these environment variables are configured in Amplify Console:
 
 ## Build Process
 
-The build process uses Deno 2 runtime:
-1. Installs Deno in the build environment
-2. Runs `deno task build` to build the Next.js app
+The build process uses npm for reliable builds:
+1. Installs dependencies with `npm install`
+2. Runs `npm run build` to build the Next.js app
 3. Serves from `.next` directory
 4. Caches build artifacts for faster subsequent builds
 
