@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getActiveTemplates } from '@/lib/templates.js';
 import { TemplateCard } from '@/components/TemplateCard.jsx';
 import Link from 'next/link';
@@ -23,11 +25,21 @@ export default async function TemplatesPage() {
         </div>
 
         {/* Templates Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {templates.map((template) => (
-            <TemplateCard key={template.id} template={template} />
-          ))}
-        </div>
+        {templates.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {templates.map((template) => (
+              <TemplateCard key={template.id} template={template} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16">
+            <h2 className="text-2xl font-semibold mb-4">No templates available yet</h2>
+            <p className="text-zinc-400 mb-8">Check back soon for new templates, or contact us for a custom solution.</p>
+            <Button asChild>
+              <Link href="/inquire">Request Custom Template</Link>
+            </Button>
+          </div>
+        )}
 
         {/* CTA Section */}
         <div className="mt-20 text-center">

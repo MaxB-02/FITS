@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple.js';
+import { requireAdminAuth } from '@/lib/auth-nextauth.js';
 import { getInquiryById, updateInquiry, deleteInquiry } from '@/lib/inquiries.js';
 
 export const runtime = 'nodejs';
 
 export async function GET(request, { params }) {
   try {
-    const user = await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
     const inquiry = await getInquiryById(params.id);
     
@@ -30,7 +30,7 @@ export async function GET(request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const user = await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
     const updates = await request.json();
     const updatedInquiry = await updateInquiry(params.id, updates);
@@ -55,11 +55,11 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const user = await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
-    const success = await deleteInquiry(params.id);
+    const result = await deleteInquiry(params.id);
     
-    if (!success) {
+    if (!result || !result.ok) {
       return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
     }
     

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple.js';
+import { requireAdminAuth } from '@/lib/auth-nextauth.js';
 import { getAllTemplates, createTemplate } from '@/lib/templates.js';
 import { revalidatePath } from 'next/cache';
 import { CreateTemplateSchema } from '@/types/template.js';
@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request) {
   try {
-    await requireAdminNode(request); // Authenticate
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const templates = await getAllTemplates();
     return NextResponse.json(templates);
   } catch (error) {
@@ -22,7 +22,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    await requireAdminNode(request); // Authenticate
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
     const body = await request.json();
     console.log('POST /api/admin/templates - Received body:', body);
@@ -57,8 +57,8 @@ export async function POST(request) {
     const templateData = {
       ...validatedData,
       active: validatedData.active !== undefined ? validatedData.active : false,
-      updatedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString()
+      updatedAt: validatedData.updatedAt || new Date().toISOString(),
+      createdAt: validatedData.createdAt || new Date().toISOString()
     };
     
     console.log('POST /api/admin/templates - Creating template with data:', templateData);

@@ -4,22 +4,13 @@ export const runtime = 'edge';
 
 export async function POST() {
   try {
-    // Create response that redirects to homepage
-    const response = NextResponse.redirect(new URL('/', process.env.BASE_URL || 'http://localhost:3000'));
-    
-    // Clear session cookie by setting it to expire immediately
-    response.cookies.set('session', '', {
-      expires: new Date(0),
-      path: '/',
-      httpOnly: true,
-      sameSite: 'Lax'
-    });
-    
+    // Redirect to NextAuth signout endpoint
+    const response = NextResponse.redirect(new URL('/api/auth/signout', process.env.NEXTAUTH_URL || 'http://localhost:3000'));
     return response;
   } catch (error) {
     console.error('Logout error:', error);
-    // Fallback: redirect to homepage even if cookie clearing fails
-    return NextResponse.redirect(new URL('/', process.env.BASE_URL || 'http://localhost:3000'));
+    // Fallback: redirect to homepage
+    return NextResponse.redirect(new URL('/', process.env.NEXTAUTH_URL || 'http://localhost:3000'));
   }
 }
 

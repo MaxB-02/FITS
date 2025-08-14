@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getActiveProjects, getProjectById } from '@/lib/portfolio.js';
 import PortfolioDetail from '@/components/PortfolioDetail.jsx';
 import { notFound } from 'next/navigation';

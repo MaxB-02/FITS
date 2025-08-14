@@ -1,0 +1,40 @@
+[
+  {
+    "id": "sample-ecommerce-platform",
+    "title": "Sample E-commerce Platform",
+    "shortDesc": "Custom e-commerce solution with inventory management and payment processing",
+    "longDesc": "A comprehensive e-commerce platform built for a local retailer, featuring product catalog management, inventory tracking, secure payment processing, and customer management. The solution streamlined their online sales process and improved customer experience.",
+    "cover": "https://picsum.photos/seed/portfolio/600",
+    "images": [],
+    "useCases": [
+      "Online retail",
+      "Product management",
+      "Customer experience",
+      "Payment processing"
+    ],
+    "active": true,
+    "updatedAt": "2025-01-14T00:00:00.000Z",
+    "createdAt": "2025-01-14T00:00:00.000Z",
+    "buyUrl": "",
+    "previewUrl": ""
+  },
+  {
+    "id": "sample-business-automation",
+    "title": "Sample Business Automation",
+    "shortDesc": "Workflow automation system for small business operations",
+    "longDesc": "Developed a comprehensive automation system that streamlined various business processes including customer onboarding, invoice generation, and reporting. This solution saved the client over 20 hours per week in manual tasks.",
+    "cover": "https://picsum.photos/seed/portfolio/601",
+    "images": [],
+    "useCases": [
+      "Process automation",
+      "Time savings",
+      "Business efficiency",
+      "Workflow optimization"
+    ],
+    "active": true,
+    "updatedAt": "2025-01-14T00:00:00.000Z",
+    "createdAt": "2025-01-14T00:00:00.000Z",
+    "buyUrl": "",
+    "previewUrl": ""
+  }
+] 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple';
+import { requireAdminAuth } from '@/lib/auth-nextauth.js';
 import { getTemplateById, updateTemplate, deleteTemplate } from '@/lib/templates';
 import { revalidatePath } from 'next/cache';
 import { UpdateTemplateSchema } from '@/types/template.js';
@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const template = await getTemplateById(params.id);
     
     if (!template) {
@@ -18,7 +18,7 @@ export async function GET(request, { params }) {
     return NextResponse.json(template);
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -26,7 +26,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const body = await request.json();
     
     // Validate with zod schema
@@ -57,7 +57,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ ok: true, template: updatedTemplate });
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -68,7 +68,7 @@ export async function PUT(request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const body = await request.json();
     
     // Validate with zod schema
@@ -99,7 +99,7 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ ok: true, template: updatedTemplate });
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -110,7 +110,7 @@ export async function PATCH(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     await deleteTemplate(params.id);
     
     // Revalidate paths to ensure public pages update
@@ -121,7 +121,7 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ ok: true, message: 'Template deleted successfully' });
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ 
       error: 'Internal server error',

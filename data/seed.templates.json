@@ -1,0 +1,82 @@
+[
+  {
+    "id": "2",
+    "name": "Inventory Tracker",
+    "price": 400,
+    "shortDesc": "2erwfrewffvsd",
+    "longDesc": "edsfvafwedsvewdvssad",
+    "features": [
+      "1",
+      "d",
+      "sd"
+    ],
+    "useCases": [
+      "2111",
+      "dsa"
+    ],
+    "images": [],
+    "cover": "https://picsum.photos/seed/template/604",
+    "previewUrl": "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?gid=0#gid=0",
+    "purchaseUrl": "",
+    "active": true,
+    "updatedAt": "2025-01-14T00:00:00.000Z",
+    "createdAt": "2025-01-14T00:00:00.000Z",
+    "buyUrl": ""
+  },
+  {
+    "id": "sample-inventory-tracker",
+    "name": "Sample Inventory Tracker",
+    "price": 49,
+    "shortDesc": "A comprehensive inventory management template with tracking and reporting features",
+    "longDesc": "This template provides a complete inventory management solution including stock tracking, low stock alerts, supplier management, and detailed reporting. Perfect for small to medium businesses looking to streamline their inventory processes.",
+    "features": [
+      "Real-time stock tracking",
+      "Low stock alerts",
+      "Supplier management",
+      "Detailed reporting",
+      "Easy customization"
+    ],
+    "useCases": [
+      "Retail businesses",
+      "Warehouse management",
+      "Small business inventory",
+      "Product tracking"
+    ],
+    "images": [],
+    "cover": "https://picsum.photos/seed/template/600",
+    "active": true,
+    "updatedAt": "2025-01-14T00:00:00.000Z",
+    "createdAt": "2025-01-14T00:00:00.000Z",
+    "previewUrl": "",
+    "purchaseUrl": "",
+    "buyUrl": ""
+  },
+  {
+    "id": "sample-project-manager",
+    "name": "Sample Project Manager",
+    "price": 39,
+    "shortDesc": "Project tracking and team collaboration template",
+    "longDesc": "Streamline your project management with this comprehensive template featuring task tracking, team collaboration, milestone management, and progress reporting. Ideal for teams of any size.",
+    "features": [
+      "Task management",
+      "Team collaboration",
+      "Milestone tracking",
+      "Progress reporting",
+      "Resource allocation"
+    ],
+    "useCases": [
+      "Software development",
+      "Marketing campaigns",
+      "Event planning",
+      "Team projects"
+    ],
+    "images": [],
+    "cover": "https://picsum.photos/seed/template/601",
+    "active": true,
+    "updatedAt": "2025-01-14T00:00:00.000Z",
+    "createdAt": "2025-01-14T00:00:00.000Z",
+    "previewUrl": "",
+    "purchaseUrl": "",
+    "buyUrl": ""
+  }
+] 

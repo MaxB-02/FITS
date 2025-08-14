@@ -2,61 +2,78 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn, getSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Check for error in URL params
+  // Check for error in URL params and show friendly messages
   useEffect(() => {
     const errorParam = searchParams.get('error');
-    if (errorParam === 'not_authorized') {
-      setError('Not authorized. This account is not in the admin allowlist.');
+    if (errorParam) {
+      let errorMessage = 'Sign-in failed. See server logs.';
+      
+      switch (errorParam) {
+        case 'OAuthCallback':
+          errorMessage = 'OAuth callback failed. Check NEXTAUTH_URL and Google Authorized redirect URI.';
+          break;
+        case 'CallbackRouteError':
+          errorMessage = 'OAuth callback route error. Verify your Google OAuth configuration.';
+          break;
+        case 'AccessDenied':
+          errorMessage = 'Not authorized. Your email is not on the admin allowlist.';
+          break;
+        case 'Configuration':
+          errorMessage = 'Authentication configuration error. Check environment variables.';
+          break;
+        case 'Verification':
+          errorMessage = 'Verification failed. Please try again.';
+          break;
+        default:
+          errorMessage = `Sign-in failed: ${errorParam}. See server logs for details.`;
+      }
+      
+      setError(errorMessage);
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // Check if user is already authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const session = await getSession();
+      if (session) {
+        router.push('/admin');
+      }
+    };
+    checkAuth();
+  }, [router]);
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
     setError('');
-
+    
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      const result = await signIn('google', { 
+        callbackUrl: '/admin',
+        redirect: false 
       });
-
-      if (response.redirected) {
-        // Follow the redirect to admin
-        window.location.href = response.url;
-      } else {
-        const result = await response.json();
-        if (response.ok) {
-          // Redirect to admin dashboard
-          router.push('/admin');
-        } else {
-          setError(result.error || 'Login failed');
-        }
+      
+      if (result?.error) {
+        setError('Google sign-in failed. Please try again.');
+      } else if (result?.url) {
+        router.push(result.url);
       }
     } catch (error) {
-      console.error('Login error:', error);
-      setError('An error occurred during login');
+      console.error('Sign-in error:', error);
+      setError('An error occurred during sign-in');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
@@ -67,53 +84,30 @@ export default function LoginPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Developer Portal</CardTitle>
             <CardDescription>
-              Sign in to access the admin dashboard
+              Sign in with Google to access the admin dashboard
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
-                  {error}
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                  placeholder="Admin1"
-                  required
-                  disabled={isSubmitting}
-                />
+            {error && (
+              <div className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+                {error}
               </div>
+            )}
+            
+            <Button 
+              onClick={handleGoogleSignIn}
+              className="w-full mb-4" 
+              disabled={isLoading}
+              variant="outline"
+            >
+              {isLoading ? 'Signing in...' : 'Sign in with Google'}
+            </Button>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  placeholder="Test1!!"
-                  required
-                  disabled={isSubmitting}
-                />
-              </div>
+            <div className="text-center text-sm text-zinc-400 mb-6">
+              Only authorized email addresses can access the admin area.
+            </div>
 
-              <Button 
-                type="submit" 
-                className="w-full" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
+            <div className="text-center">
               <Link 
                 href="/" 
                 className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors"

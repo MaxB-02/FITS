@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple.js';
+import { requireAdminAuth } from '@/lib/auth-nextauth.js';
 import { getAllInquiries, createInquiry } from '@/lib/inquiries.js';
 
 export const runtime = 'nodejs';
 
 export async function GET(request) {
   try {
-    const user = await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
     const inquiries = await getAllInquiries();
     return NextResponse.json(inquiries);
@@ -25,7 +25,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const user = await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
     const data = await request.json();
     const inquiry = await createInquiry(data);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple.js';
+import { requireAdminAuth } from '@/lib/auth-nextauth.js';
 import { getAllProjects, createProject } from '@/lib/portfolio.js';
 import { revalidatePath } from 'next/cache';
 import { CreatePortfolioSchema } from '@/types/portfolio.js';
@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request) {
   try {
-    await requireAdminNode(request); // Authenticate
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const projects = await getAllProjects();
     return NextResponse.json(projects);
   } catch (error) {
@@ -22,7 +22,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    await requireAdminNode(request); // Authenticate
+    await requireAdminAuth(request); // Authenticate with NextAuth
     
     const body = await request.json();
     console.log('POST /api/admin/portfolio - Received body:', body);

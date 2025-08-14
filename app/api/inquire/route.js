@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { readJSON, writeJSON } from '@/lib/file-db.js';
+import { getLeads, setLeads } from '@/lib/store.js';
 import { revalidatePath } from 'next/cache';
 
 export const runtime = 'nodejs';
@@ -112,19 +112,19 @@ export async function POST(request) {
       status: 'new'
     };
 
-    // Save to leads.json
+    // Save to store (S3 in production, local files in dev)
     try {
-      console.log('Attempting to save inquiry to leads.json');
+      console.log('Attempting to save inquiry to store');
       console.log('Current working directory:', process.cwd());
       
-      const leads = await readJSON('data/leads.json');
+      const leads = await getLeads();
       console.log('Current leads count:', leads.length);
       console.log('Adding new inquiry:', inquiry);
       
       leads.push(inquiry);
-      await writeJSON('data/leads.json', leads);
+      await setLeads(leads);
       
-      console.log('Successfully saved inquiry to local database');
+      console.log('Successfully saved inquiry to store');
       console.log('New leads count:', leads.length);
       
       // Revalidate admin paths to ensure new inquiries appear immediately

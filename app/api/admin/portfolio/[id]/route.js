@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple';
+import { requireAdminAuth } from '@/lib/auth-nextauth.js';
 import { getProjectById, updateProject, deleteProject } from '@/lib/portfolio';
 import { revalidatePath } from 'next/cache';
 import { UpdatePortfolioSchema } from '@/types/portfolio.js';
@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 
 export async function GET(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const project = await getProjectById(params.id);
     
     if (!project) {
@@ -18,7 +18,7 @@ export async function GET(request, { params }) {
     return NextResponse.json(project);
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -26,7 +26,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     const body = await request.json();
     
     // Validate with zod schema
@@ -58,7 +58,7 @@ export async function PUT(request, { params }) {
     return NextResponse.json({ ok: true, project: updatedProject });
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ 
       error: 'Internal server error',
@@ -69,7 +69,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    await requireAdminNode(request);
+    await requireAdminAuth(request); // Authenticate with NextAuth
     await deleteProject(params.id);
     
     // Revalidate paths to ensure public pages update
@@ -80,7 +80,7 @@ export async function DELETE(request, { params }) {
     return NextResponse.json({ ok: true, message: 'Project deleted successfully' });
   } catch (error) {
     if (error.message === 'Unauthorized') {
-      return NextResponse.redirect(new URL('/login', request.url));
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return NextResponse.json({ 
       error: 'Internal server error',
