@@ -1,0 +1,21 @@
+---
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - curl -fsSL https://deno.land/x/install/install.sh | sh
+        - export DENO_INSTALL="$HOME/.deno"
+        - export PATH="$DENO_INSTALL/bin:$PATH"
+    build:
+      commands:
+        - npm install
+        - npm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+--- 

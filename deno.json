@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "dev": "deno run -A npm:next dev",
+    "build": "deno run -A npm:next build",
+    "start": "deno run -A npm:next start"
+  }
+
+} 

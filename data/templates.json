@@ -1,0 +1,54 @@
+[
+  {
+    "id": "test-template",
+    "name": "Test Template",
+    "price": 40,
+    "shortDesc": "A test template for verification",
+    "features": [
+      "2",
+      "3",
+      "4",
+      "5."
+    ],
+    "useCases": [
+      "1",
+      "2",
+      "3",
+      "2.   1",
+      "2"
+    ],
+    "images": [],
+    "cover": "https://picsum.photos/seed/template/600",
+    "active": false,
+    "updatedAt": "2025-08-14T00:43:24.477Z",
+    "createdAt": "2025-08-13T02:41:05.030Z",
+    "longDesc": "this shit pretty sick",
+    "previewUrl": "",
+    "purchaseUrl": "",
+    "buyUrl": ""
+  },
+  {
+    "id": "2",
+    "name": "Inventory Tracker",
+    "price": 400,
+    "shortDesc": "2erwfrewffvsd",
+    "longDesc": "edsfvafwedsvewdvssad",
+    "features": [
+      "1",
+      "d",
+      "sd"
+    ],
+    "useCases": [
+      "2111",
+      "dsa"
+    ],
+    "images": [],
+    "cover": "https://picsum.photos/seed/template/604",
+    "previewUrl": "https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?gid=0#gid=0",
+    "purchaseUrl": "",
+    "active": true,
+    "updatedAt": "2025-08-13T21:57:49.250Z",
+    "createdAt": "2025-08-13T04:03:23.917Z",
+    "buyUrl": ""
+  }
+]

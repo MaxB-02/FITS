@@ -1,0 +1,63 @@
+[
+  {
+    "id": "inquiry-1755122464027-bkwdscz2z",
+    "createdAt": "2025-08-13T22:01:04.027Z",
+    "name": "Maxwell Brenner",
+    "email": "2maxbrenner@gmail.com",
+    "company": "safasasdfadd",
+    "phone": "8163821855",
+    "services": [
+      "Data Processing",
+      "Custom Dashboard"
+    ],
+    "description": "asfdsdfasd",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "budgetLow": 100,
+    "budgetHigh": 1000,
+    "desiredDate": "2025-08-25",
+    "templateId": null,
+    "status": "new"
+  },
+  {
+    "id": "inquiry-1755130537525-yachxkxy5",
+    "createdAt": "2025-08-14T00:15:37.525Z",
+    "name": "12345",
+    "email": "12345@gmail.com",
+    "company": "12345",
+    "phone": "12345",
+    "services": [
+      "Custom Dashboard",
+      "Data Processing"
+    ],
+    "description": "1234512345123451234512345",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "budgetLow": 1234500,
+    "budgetHigh": 12345000,
+    "desiredDate": "2025-08-20",
+    "templateId": null,
+    "status": "accepted",
+    "reviewedAt": "2025-08-14T00:15:50.363Z"
+  },
+  {
+    "id": "inquiry-1755132233518-7dgekis6g",
+    "createdAt": "2025-08-14T00:43:53.518Z",
+    "name": "2312343",
+    "email": "2134123@gmail.com",
+    "company": "weafsd ",
+    "phone": "231423421334",
+    "services": [
+      "Data Processing"
+    ],
+    "description": "sa dfsda ",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "budgetLow": 1000,
+    "budgetHigh": 9800,
+    "desiredDate": "2025-08-20",
+    "templateId": null,
+    "status": "accepted",
+    "reviewedAt": "2025-08-14T00:44:07.617Z"
+  }
+]
