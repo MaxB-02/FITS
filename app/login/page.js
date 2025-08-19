@@ -38,19 +38,15 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include',
       });
 
-      if (response.redirected) {
-        // Follow the redirect to admin
-        window.location.href = response.url;
+      const result = await response.json().catch(() => ({}));
+      if (response.ok) {
+        // Navigate to admin after cookie is set
+        router.push('/admin');
       } else {
-        const result = await response.json();
-        if (response.ok) {
-          // Redirect to admin dashboard
-          router.push('/admin');
-        } else {
-          setError(result.error || 'Login failed');
-        }
+        setError(result.error || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);

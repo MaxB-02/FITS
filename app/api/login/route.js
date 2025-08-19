@@ -24,16 +24,13 @@ export async function POST(request) {
     }
 
     // Create session
-    const token = await signSession({ 
-      id: 'admin', 
-      role: 'admin'
-    });
+    const token = await signSession({ id: 'admin', role: 'admin' });
 
-    // Create response that redirects to admin on the same origin as the request
-    const origin = new URL(request.url).origin;
-    const response = NextResponse.redirect(new URL('/admin', origin));
+    // Return JSON success and set cookie on the response (more reliable with fetch)
+    const response = NextResponse.json({ ok: true }, { status: 200 });
+    response.headers.append('Cache-Control', 'no-store');
+    response.headers.append('Pragma', 'no-cache');
 
-    // Set session cookie
     const cookie = cookieSerialize('session', token, {
       maxAge: 604800, // 7 days
       path: '/',
@@ -41,7 +38,6 @@ export async function POST(request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     });
-    
     response.headers.set('Set-Cookie', cookie);
     return response;
 
