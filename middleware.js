@@ -16,7 +16,9 @@ export function middleware(request) {
       if (!user) {
         // Redirect to login for page requests
         if (pathname.startsWith('/admin')) {
-          return NextResponse.redirect(new URL('/login?error=AccessDenied', request.url));
+          const url = new URL('/login', request.url);
+          url.searchParams.set('error', 'AccessDenied');
+          return NextResponse.redirect(url);
         }
         
         // Return 401 for API requests

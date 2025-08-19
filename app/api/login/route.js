@@ -26,19 +26,17 @@ export async function POST(request) {
     // Create session
     const token = await signSession({ id: 'admin', role: 'admin' });
 
-    // Return JSON success and set cookie on the response (more reliable with fetch)
+    // Return JSON success and set cookie via NextResponse cookies API (Edge-safe)
     const response = NextResponse.json({ ok: true }, { status: 200 });
     response.headers.append('Cache-Control', 'no-store');
     response.headers.append('Pragma', 'no-cache');
-
-    const cookie = cookieSerialize('session', token, {
-      maxAge: 604800, // 7 days
+    response.cookies.set('session', token, {
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
-      sameSite: 'Lax',
+      sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     });
-    response.headers.set('Set-Cookie', cookie);
     return response;
 
   } catch (error) {
