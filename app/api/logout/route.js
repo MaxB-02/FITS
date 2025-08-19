@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { cookieSerialize } from '@/lib/auth-simple.js';
 
 export const runtime = 'edge';
 
@@ -8,16 +7,14 @@ export async function POST(request) {
     // Redirect to homepage on same origin as request
     const origin = new URL(request.url).origin;
     const response = NextResponse.redirect(new URL('/', origin));
-    
-    // Clear session cookie explicitly matching attributes
-    const deleteCookie = cookieSerialize('session', '', {
+    // Clear session cookie via platform API
+    response.cookies.set('session', '', {
       maxAge: 0,
       path: '/',
-      sameSite: 'Lax',
+      sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     });
-    response.headers.set('Set-Cookie', deleteCookie);
     
     return response;
   } catch (error) {
@@ -25,14 +22,13 @@ export async function POST(request) {
     // Fallback: redirect to homepage even if cookie clearing fails
     const origin = new URL(request.url).origin;
     const res = NextResponse.redirect(new URL('/', origin));
-    const deleteCookie = cookieSerialize('session', '', {
+    res.cookies.set('session', '', {
       maxAge: 0,
       path: '/',
-      sameSite: 'Lax',
+      sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production'
     });
-    res.headers.set('Set-Cookie', deleteCookie);
     return res;
   }
 }
