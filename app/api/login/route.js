@@ -29,8 +29,9 @@ export async function POST(request) {
       role: 'admin'
     });
 
-    // Create response that redirects to admin
-    const response = NextResponse.redirect(new URL('/admin', process.env.BASE_URL || 'http://localhost:3000'));
+    // Create response that redirects to admin on the same origin as the request
+    const origin = new URL(request.url).origin;
+    const response = NextResponse.redirect(new URL('/admin', origin));
 
     // Set session cookie
     const cookie = cookieSerialize('session', token, {
