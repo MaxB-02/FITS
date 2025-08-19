@@ -1,0 +1,13 @@
+[
+  {
+    "id": "1",
+    "title": "Seed Project",
+    "shortDesc": "Seed portfolio item.",
+    "longDesc": "Used when prod data empty.",
+    "images": [],
+    "cover": "",
+    "useCases": [],
+    "active": true
+  }
+]
+

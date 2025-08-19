@@ -1,0 +1,14 @@
+[
+  {
+    "id": "test-template",
+    "name": "Test Template",
+    "price": 0,
+    "shortDesc": "Seed template.",
+    "longDesc": "Seed item for production.",
+    "images": [],
+    "cover": "",
+    "useCases": [],
+    "active": true
+  }
+]
+

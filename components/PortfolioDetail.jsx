@@ -35,13 +35,11 @@ export default function PortfolioDetail({ project }) {
                 </div>
               )}
             </div>
-            {project.cover && (
-              <img 
-                src={project.cover} 
-                alt={project.title}
-                className="w-32 h-32 object-cover rounded-lg"
-              />
-            )}
+            <img 
+              src={project.cover || 'https://picsum.photos/seed/template/600'} 
+              alt={project.title}
+              className="w-32 h-32 object-cover rounded-lg"
+            />
           </div>
         </CardHeader>
       </Card>
@@ -80,11 +78,11 @@ export default function PortfolioDetail({ project }) {
               </Button>
             )}
 
-            {/* Preview Template Button */}
+            {/* Preview button only if URL is provided */}
             {project.previewUrl && (
               <Button variant="outline" size="lg" asChild>
                 <a href={project.previewUrl} target="_blank" rel="noopener noreferrer">
-                  Preview Template
+                  Preview
                 </a>
               </Button>
             )}

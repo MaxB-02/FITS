@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getActiveProjects } from '@/lib/portfolio.js';
 import PortfolioCard from '@/components/PortfolioCard.jsx';
 import Link from 'next/link';

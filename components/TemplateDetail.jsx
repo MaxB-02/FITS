@@ -303,43 +303,34 @@ export default function TemplateDetail({ template, onSave, onDelete, isEditing =
               
               {/* Action Buttons - Moved to top */}
               <div className="flex space-x-4">
-                {/* Buy Template Button */}
-                <Button asChild variant="default" size="lg">
-                  {template.buyUrl ? (
+                {/* Buy button only if a URL is provided */}
+                {template.buyUrl && (
+                  <Button asChild variant="default" size="lg">
                     <a href={template.buyUrl} target="_blank" rel="noopener noreferrer">
                       Buy Template
                     </a>
-                  ) : (
-                    <a href={`/inquire?template=${template.id}`}>
-                      Buy Template
-                    </a>
-                  )}
-                </Button>
-                
-                {/* Preview Template Button - Always show */}
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  asChild={!!template.previewUrl}
-                  disabled={!template.previewUrl}
-                >
-                  {template.previewUrl ? (
+                  </Button>
+                )}
+
+                {/* Preview button only if a URL is provided */}
+                {template.previewUrl && (
+                  <Button 
+                    variant="outline" 
+                    size="lg"
+                    asChild
+                  >
                     <a href={template.previewUrl} target="_blank" rel="noopener noreferrer">
                       Preview Template
                     </a>
-                  ) : (
-                    <span>Preview Template (Coming Soon)</span>
-                  )}
-                </Button>
+                  </Button>
+                )}
               </div>
             </div>
-            {template.cover && (
-              <img 
-                src={template.cover} 
-                alt={template.name}
-                className="w-32 h-32 object-cover rounded-lg"
-              />
-            )}
+            <img 
+              src={template.cover || 'https://picsum.photos/seed/template/600'} 
+              alt={template.name}
+              className="w-32 h-32 object-cover rounded-lg"
+            />
           </div>
         </CardHeader>
       </Card>

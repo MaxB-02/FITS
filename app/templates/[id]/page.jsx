@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getTemplateById } from '@/lib/templates.js';
 import TemplateDetail from '@/components/TemplateDetail.jsx';
 import { notFound } from 'next/navigation';

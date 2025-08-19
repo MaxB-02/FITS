@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getActiveTemplates } from '@/lib/templates.js';
 import { TemplateCard } from '@/components/TemplateCard.jsx';
 import Link from 'next/link';
