@@ -10,6 +10,8 @@ export async function POST(request) {
   try {
     let inquiryData;
     let filePath = null;
+    const dataDir = process.env.DATA_DIR || 'data';
+    const uploadsDirRoot = process.env.UPLOADS_DIR || 'uploads';
 
     // Check if this is multipart/form-data (file upload)
     const contentType = request.headers.get('content-type') || '';
@@ -22,7 +24,9 @@ export async function POST(request) {
       const file = formData.get('file');
       if (file && file instanceof File) {
         // Create uploads directory if it doesn't exist
-        const uploadsDir = path.join(process.cwd(), 'uploads');
+        const uploadsDir = path.isAbsolute(uploadsDirRoot)
+          ? uploadsDirRoot
+          : path.join(process.cwd(), uploadsDirRoot);
         await fs.mkdir(uploadsDir, { recursive: true });
         
         // Generate unique filename
@@ -37,7 +41,7 @@ export async function POST(request) {
         await fs.writeFile(uploadPath, buffer);
         
         // Store relative path for database
-        filePath = `uploads/${fileName}`;
+        filePath = `${uploadsDirRoot.replace(/\/$/, '')}/${fileName}`;
         
         console.log(`File uploaded successfully: ${uploadPath}`);
       }
@@ -117,12 +121,15 @@ export async function POST(request) {
       console.log('Attempting to save inquiry to leads.json');
       console.log('Current working directory:', process.cwd());
       
-      const leads = await readJSON('data/leads.json');
+      const leadsPath = path.isAbsolute(dataDir)
+        ? path.join(dataDir, 'leads.json')
+        : path.join(process.cwd(), dataDir, 'leads.json');
+      const leads = await readJSON(leadsPath);
       console.log('Current leads count:', leads.length);
       console.log('Adding new inquiry:', inquiry);
       
       leads.push(inquiry);
-      await writeJSON('data/leads.json', leads);
+      await writeJSON(leadsPath, leads);
       
       console.log('Successfully saved inquiry to local database');
       console.log('New leads count:', leads.length);

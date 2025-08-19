@@ -8,11 +8,15 @@ export async function GET(request, { params }) {
   try {
     // Construct the file path from the URL parameters
     const filePath = params.path.join('/');
-    const fullPath = path.join(process.cwd(), 'uploads', filePath);
+    const uploadsDirRoot = process.env.UPLOADS_DIR || 'uploads';
+    const baseUploads = path.isAbsolute(uploadsDirRoot)
+      ? uploadsDirRoot
+      : path.join(process.cwd(), uploadsDirRoot);
+    const fullPath = path.join(baseUploads, filePath);
     
     // Security check: ensure the path is within the uploads directory
     const normalizedPath = path.normalize(fullPath);
-    const uploadsDir = path.join(process.cwd(), 'uploads');
+    const uploadsDir = baseUploads;
     
     if (!normalizedPath.startsWith(uploadsDir)) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
