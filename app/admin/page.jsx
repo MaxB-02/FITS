@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { BarChart3, Users, CheckCircle, XCircle, ArrowRight, Package } from 'lucide-react';
 import { getAllInquiries } from '@/lib/inquiries.js';
 import { getAllTemplates } from '@/lib/templates.js';
+export const dynamic = 'force-dynamic';
 import { getAllProjects } from '@/lib/portfolio.js';
 
 export default async function AdminDashboardPage() {
