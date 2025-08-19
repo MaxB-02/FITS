@@ -43,8 +43,8 @@ export default function LoginPage() {
 
       const result = await response.json().catch(() => ({}));
       if (response.ok) {
-        // Navigate to admin after cookie is set
-        router.push('/admin');
+        // Do a full navigation to ensure middleware sees the new cookie
+        window.location.assign('/admin');
       } else {
         setError(result.error || 'Login failed');
       }
