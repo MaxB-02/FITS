@@ -1,35 +1,18 @@
-'use client';
-
-import { useState, useEffect } from 'react';
+import { getAllInquiries } from '@/lib/inquiries.js';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, CheckCircle, XCircle, Trash2, Download } from 'lucide-react';
 import Link from 'next/link';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
-export default function AdminInquiriesPage() {
-  const [inquiries, setInquiries] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchInquiries = async () => {
-      try {
-        const response = await fetch('/api/admin/inquiries');
-        if (response.ok) {
-          const data = await response.json();
-          setInquiries(data);
-        }
-      } catch (error) {
-        console.error('Error fetching inquiries:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInquiries();
-  }, []);
+export default async function AdminInquiriesPage() {
+  noStore();
+  
+  // Fetch inquiries directly on the server (same as dashboard)
+  const inquiries = await getAllInquiries();
 
   return (
     <div>
@@ -54,17 +37,11 @@ export default function AdminInquiriesPage() {
 
       {/* Results Count */}
       <div className="mb-4 text-sm text-muted-foreground">
-        {loading ? 'Loading...' : `Showing ${inquiries.length} inquiries`}
+        Showing {inquiries.length} inquiries
       </div>
 
       {/* Inquiries List */}
-      {loading ? (
-        <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-gray-600">Loading inquiries...</p>
-          </CardContent>
-        </Card>
-      ) : inquiries.length === 0 ? (
+      {inquiries.length === 0 ? (
         <Card>
           <CardContent className="text-center py-8">
             <p className="text-gray-600">No inquiries found.</p>
@@ -206,70 +183,50 @@ export default function AdminInquiriesPage() {
 
                     {inquiry.status === 'new' && (
                       <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-green-600 hover:text-green-700"
-                          onClick={async () => {
-                            try {
-                              const response = await fetch(`/api/admin/inquiries/${inquiry.id}`, {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ status: 'accepted' })
-                              });
-                              if (response.ok) window.location.reload();
-                            } catch (error) {
-                              console.error('Error updating inquiry:', error);
-                            }
-                          }}
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          Accept
-                        </Button>
+                        <form action={`/api/admin/inquiries/${inquiry.id}`} method="POST" className="inline">
+                          <input type="hidden" name="status" value="accepted" />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-green-600 hover:text-green-700"
+                            type="submit"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Accept
+                          </Button>
+                        </form>
 
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 hover:text-red-700"
-                          onClick={async () => {
-                            try {
-                              const response = await fetch(`/api/admin/inquiries/${inquiry.id}`, {
-                                method: 'PATCH',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ status: 'declined' })
-                              });
-                              if (response.ok) window.location.reload();
-                            } catch (error) {
-                              console.error('Error updating inquiry:', error);
-                            }
-                          }}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Decline
-                        </Button>
+                        <form action={`/api/admin/inquiries/${inquiry.id}`} method="POST" className="inline">
+                          <input type="hidden" name="status" value="declined" />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 hover:text-red-700"
+                            type="submit"
+                          >
+                            <XCircle className="h-4 w-4 mr-1" />
+                            Decline
+                          </Button>
+                        </form>
                       </div>
                     )}
 
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-red-600 hover:text-red-700"
-                      onClick={async () => {
-                        if (confirm('Are you sure you want to delete this inquiry?')) {
-                          try {
-                            const response = await fetch(`/api/admin/inquiries/${inquiry.id}`, {
-                              method: 'DELETE'
-                            });
-                            if (response.ok) window.location.reload();
-                          } catch (error) {
-                            console.error('Error deleting inquiry:', error);
+                    <form action={`/api/admin/inquiries/${inquiry.id}/delete`} method="POST" className="inline">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-600 hover:text-red-700"
+                        type="submit"
+                        onClick={(e) => {
+                          if (!confirm('Are you sure you want to delete this inquiry?')) {
+                            e.preventDefault();
                           }
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
-                    </Button>
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </form>
                   </div>
                 </div>
               </CardContent>
