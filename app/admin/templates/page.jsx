@@ -37,9 +37,11 @@ export default async function AdminTemplatesPage() {
             <Button variant="outline">Dashboard</Button>
           </Link>
           
-          <Button disabled title="Add template functionality requires the full client component - coming soon">
-            <Package className="w-4 h-4 mr-2" />
-            Add Template
+          <Button asChild>
+            <Link href="/admin/templates/new">
+              <Package className="w-4 h-4 mr-2" />
+              Add Template
+            </Link>
           </Button>
         </div>
       </div>
@@ -114,9 +116,11 @@ export default async function AdminTemplatesPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <p className="text-muted-foreground mb-4">No templates found.</p>
-            <Button disabled title="Add template functionality requires the full client component - coming soon">
-              <Package className="w-4 h-4 mr-2" />
-              Create Your First Template
+            <Button asChild>
+              <Link href="/admin/templates/new">
+                <Package className="w-4 h-4 mr-2" />
+                Create Your First Template
+              </Link>
             </Button>
           </CardContent>
         </Card>

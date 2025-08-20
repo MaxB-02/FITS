@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Eye, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { noStore } from 'next/cache';
+import { unstable_noStore as noStore } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,9 +18,11 @@ export default async function AdminPortfolioPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Portfolio Management</h1>
-        <Button disabled title="Add project functionality requires the full client component - coming soon">
-          <Plus className="w-4 h-4 mr-2" />
-          New Project
+        <Button asChild>
+          <Link href="/admin/portfolio/new">
+            <Plus className="w-4 h-4 mr-2" />
+            New Project
+          </Link>
         </Button>
       </div>
 
@@ -58,11 +60,12 @@ export default async function AdminPortfolioPage() {
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled
-                    title="Edit functionality requires the full client component - coming soon"
+                    asChild
                   >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
+                    <Link href={`/admin/portfolio/${project.id}`}>
+                      <Edit className="h-4 w-4 mr-1" />
+                      Edit
+                    </Link>
                   </Button>
                   <Button
                     size="sm"
@@ -94,9 +97,11 @@ export default async function AdminPortfolioPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <p className="text-muted-foreground mb-4">No portfolio projects yet.</p>
-            <Button disabled title="Add project functionality requires the full client component - coming soon">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Your First Project
+            <Button asChild>
+              <Link href="/admin/portfolio/new">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Project
+              </Link>
             </Button>
           </CardContent>
         </Card>
