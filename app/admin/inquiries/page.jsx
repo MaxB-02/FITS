@@ -4,14 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, CheckCircle, XCircle, Trash2, Download } from 'lucide-react';
 import Link from 'next/link';
-import { unstable_noStore as noStore } from 'next/cache';
+import { noStore } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminInquiriesPage() {
   noStore();
   
-  // Fetch inquiries directly on the server (same as dashboard)
+  // Fetch inquiries directly on the server with bulletproof error handling
   let inquiries = [];
   try {
     inquiries = await getAllInquiries();
@@ -21,10 +21,30 @@ export default async function AdminInquiriesPage() {
     inquiries = [];
   }
   
-  // Ensure we have an array
+  // Ensure we have an array and filter out invalid data
   if (!Array.isArray(inquiries)) {
     inquiries = [];
   }
+  
+  // Filter out any malformed inquiry objects
+  inquiries = inquiries.filter(inquiry => inquiry && inquiry.id);
+
+  const formatDate = (dateString) => {
+    try {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return 'Invalid Date';
+    }
+  };
 
   return (
     <div>
@@ -57,60 +77,59 @@ export default async function AdminInquiriesPage() {
         <Card>
           <CardContent className="text-center py-8">
             <p className="text-gray-600">No inquiries found.</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Inquiries will appear here when customers submit project requests.
+            </p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {inquiries.map((inquiry) => {
-            // Skip malformed inquiry objects
-            if (!inquiry || !inquiry.id) {
-              return null;
-            }
-            
-            return (
-              <Card key={inquiry.id}>
+          {inquiries.map((inquiry) => (
+            <Card key={inquiry.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">{inquiry.name}</CardTitle>
-                    <p className="text-sm text-gray-600">{inquiry.email}</p>
+                    <CardTitle className="text-lg">{inquiry.name || 'Unnamed'}</CardTitle>
+                    <p className="text-sm text-gray-600">{inquiry.email || 'No email'}</p>
                     {inquiry.company && <p className="text-sm text-gray-600">{inquiry.company}</p>}
                   </div>
                   <div className="text-right">
-                    <Badge variant={inquiry.status === 'new' ? 'default' : inquiry.status === 'accepted' ? 'secondary' : 'destructive'}>
-                      {inquiry.status}
+                    <Badge variant={
+                      inquiry.status === 'new' ? 'default' : 
+                      inquiry.status === 'accepted' ? 'secondary' : 
+                      'destructive'
+                    }>
+                      {inquiry.status || 'unknown'}
                     </Badge>
                     <p className="text-xs text-gray-500 mt-1">
-                      {new Date(inquiry.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
+                      {formatDate(inquiry.createdAt)}
                     </p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {inquiry.services && inquiry.services.length > 0 && (
+                  {inquiry.services && Array.isArray(inquiry.services) && inquiry.services.length > 0 && (
                     <div>
                       <strong>Services:</strong>
                       <div className="flex flex-wrap gap-1 mt-1">
                         {inquiry.services.map((service, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
-                            {service}
+                            {service || 'Unknown Service'}
                           </Badge>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  <div>
-                    <strong>Description:</strong>
-                    <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-                      {inquiry.description}
-                    </p>
-                  </div>
+                  {inquiry.description && (
+                    <div>
+                      <strong>Description:</strong>
+                      <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+                        {inquiry.description}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     {inquiry.phone && (
@@ -118,7 +137,7 @@ export default async function AdminInquiriesPage() {
                         <strong>Phone:</strong> {inquiry.phone}
                       </div>
                     )}
-                    {inquiry.budgetLow || inquiry.budgetHigh ? (
+                    {(inquiry.budgetLow || inquiry.budgetHigh) && (
                       <div>
                         <strong>Budget:</strong> 
                         {inquiry.budgetLow && inquiry.budgetHigh 
@@ -128,7 +147,8 @@ export default async function AdminInquiriesPage() {
                             : `Up to $${inquiry.budgetHigh}`
                         }
                       </div>
-                    ) : inquiry.budget && (
+                    )}
+                    {inquiry.budget && !inquiry.budgetLow && !inquiry.budgetHigh && (
                       <div>
                         <strong>Budget:</strong> {inquiry.budget}
                       </div>
@@ -199,58 +219,49 @@ export default async function AdminInquiriesPage() {
                       </>
                     )}
 
+                    {/* Status Update Buttons - Disabled for now (require client-side functionality) */}
                     {inquiry.status === 'new' && (
                       <div className="flex gap-2">
-                        <form action={`/api/admin/inquiries/${inquiry.id}`} method="POST" className="inline">
-                          <input type="hidden" name="status" value="accepted" />
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-green-600 hover:text-green-700"
-                            type="submit"
-                          >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Accept
-                          </Button>
-                        </form>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-green-600 hover:text-green-700"
+                          disabled
+                          title="Status updates require client-side functionality - coming soon"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Accept
+                        </Button>
 
-                        <form action={`/api/admin/inquiries/${inquiry.id}`} method="POST" className="inline">
-                          <input type="hidden" name="status" value="declined" />
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-red-600 hover:text-red-700"
-                            type="submit"
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Decline
-                          </Button>
-                        </form>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700"
+                          disabled
+                          title="Status updates require client-side functionality - coming soon"
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Decline
+                        </Button>
                       </div>
                     )}
 
-                    <form action={`/api/admin/inquiries/${inquiry.id}/delete`} method="POST" className="inline">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-red-600 hover:text-red-700"
-                        type="submit"
-                        onClick={(e) => {
-                          if (!confirm('Are you sure you want to delete this inquiry?')) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Delete
-                      </Button>
-                    </form>
+                    {/* Delete Button - Disabled for now (requires client-side confirmation) */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 hover:text-red-700"
+                      disabled
+                      title="Delete functionality requires client-side confirmation - coming soon"
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            );
-          })}
+          ))}
         </div>
       )}
     </div>
