@@ -8,30 +8,45 @@ export const dynamic = 'force-dynamic';
 import { getAllProjects } from '@/lib/portfolio.js';
 
 export default async function AdminDashboardPage() {
-  const [inquiries, templates, projects] = await Promise.all([
-    getAllInquiries(),
-    getAllTemplates(),
-    getAllProjects()
-  ]);
+  // Fetch data with error handling - if any fail, use empty arrays
+  let inquiries = [];
+  let templates = [];
+  let projects = [];
+  
+  try {
+    [inquiries, templates, projects] = await Promise.all([
+      getAllInquiries().catch(() => []),
+      getAllTemplates().catch(() => []),
+      getAllProjects().catch(() => [])
+    ]);
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    // Continue with empty arrays if all fail
+  }
 
-  // Calculate stats
+  // Calculate stats with error handling
   const stats = {
-    total: inquiries.length,
-    new: inquiries.filter(inq => inq.status === 'new').length,
-    accepted: inquiries.filter(inq => inq.status === 'accepted').length,
-    declined: inquiries.filter(inq => inq.status === 'declined').length
+    total: Array.isArray(inquiries) ? inquiries.length : 0,
+    new: Array.isArray(inquiries) ? inquiries.filter(inq => inq && inq.status === 'new').length : 0,
+    accepted: Array.isArray(inquiries) ? inquiries.filter(inq => inq && inq.status === 'accepted').length : 0,
+    declined: Array.isArray(inquiries) ? inquiries.filter(inq => inq && inq.status === 'declined').length : 0
   };
 
-  // Get recent inquiries (last 5)
-  const recentInquiries = inquiries.slice(0, 5);
+  // Get recent inquiries (last 5) with error handling
+  const recentInquiries = Array.isArray(inquiries) ? inquiries.slice(0, 5) : [];
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      if (!dateString) return 'N/A';
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -185,7 +200,7 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-emerald-600">
-              {templates.length}
+              {Array.isArray(templates) ? templates.length : 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Active templates
@@ -202,7 +217,7 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600">
-              {projects.length}
+              {Array.isArray(projects) ? projects.length : 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Portfolio projects
@@ -258,7 +273,7 @@ export default async function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {templates.length === 0 ? (
+            {!Array.isArray(templates) || templates.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">No templates yet</p>
             ) : (
               <div className="space-y-3">
