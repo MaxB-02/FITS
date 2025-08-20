@@ -4,13 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, CheckCircle, XCircle, Trash2, Download } from 'lucide-react';
 import Link from 'next/link';
-import { noStore } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminInquiriesPage() {
-  noStore();
-  
   // Fetch inquiries directly on the server with bulletproof error handling
   let inquiries = [];
   try {

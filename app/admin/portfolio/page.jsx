@@ -4,13 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Eye, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { noStore } from 'next/cache';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPortfolioPage() {
-  noStore();
-  
   // Fetch projects directly on the server with bulletproof error handling
   let projects = [];
   try {
