@@ -58,14 +58,15 @@ export function InquiryForm({ templateId }) {
     
     if (isSubmitting) return;
     
-    console.log('Form submission started');
-    console.log('Form data:', formData);
+    console.log('🚀 Form submission started');
+    console.log('📝 Form data:', formData);
     
     // Basic validation
     if (!formData.name || !formData.email || !formData.description) {
+      console.log('❌ Validation failed: missing required fields');
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields.",
+        description: "Please fill in all required fields (Name, Email, and Description).",
         variant: "destructive"
       });
       return;
@@ -73,6 +74,7 @@ export function InquiryForm({ templateId }) {
 
     // Budget validation
     if (formData.budgetLow && formData.budgetHigh && parseFloat(formData.budgetLow) > parseFloat(formData.budgetHigh)) {
+      console.log('❌ Validation failed: budget high < budget low');
       toast({
         title: "Validation Error",
         description: "Budget high must be greater than or equal to budget low.",
@@ -82,7 +84,7 @@ export function InquiryForm({ templateId }) {
     }
 
     setIsSubmitting(true);
-    console.log('Form validation passed, submitting...');
+    console.log('✅ Form validation passed, submitting...');
 
     try {
       // Create FormData for file upload
@@ -109,40 +111,54 @@ export function InquiryForm({ templateId }) {
       const fileInput = document.getElementById('fileUpload');
       if (fileInput && fileInput.files[0]) {
         submitData.append('file', fileInput.files[0]);
+        console.log('📁 File attached:', fileInput.files[0].name);
       }
 
-      console.log('Submitting form data to /api/inquire');
+      console.log('📤 Submitting form data to /api/inquire');
+      console.log('🔗 URL:', window.location.origin + '/api/inquire');
+      
       const response = await fetch('/api/inquire', {
         method: 'POST',
         body: submitData, // Don't set Content-Type header for FormData
       });
 
-      console.log('Response received:', response);
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+      console.log('📥 Response received:', response);
+      console.log('📊 Response status:', response.status);
+      console.log('✅ Response ok:', response.ok);
+      console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Response data:', result);
+        console.log('📄 Response data:', result);
         
         if (result.success) {
+          console.log('🎉 Success! Redirecting to thank-you page');
+          
           // Show success toast
           toast({
             title: "Success!",
-            description: "Your inquiry has been submitted successfully.",
+            description: "Your inquiry has been submitted successfully. Redirecting...",
           });
           
-          // Redirect to thank-you page
-          router.push('/thank-you');
+          // Wait a moment for the toast to show, then redirect
+          setTimeout(() => {
+            router.push('/thank-you');
+          }, 1500);
         } else {
           throw new Error(result.error || 'Failed to submit inquiry');
         }
       } else {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to submit inquiry');
+        let errorMessage = 'Failed to submit inquiry';
+        try {
+          const result = await response.json();
+          errorMessage = result.error || errorMessage;
+        } catch (parseError) {
+          console.log('⚠️ Could not parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error('Error submitting inquiry:', error);
+      console.error('💥 Error submitting inquiry:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit inquiry. Please try again.",
@@ -150,6 +166,7 @@ export function InquiryForm({ templateId }) {
       });
     } finally {
       setIsSubmitting(false);
+      console.log('🏁 Form submission finished');
     }
   };
 
@@ -174,6 +191,7 @@ export function InquiryForm({ templateId }) {
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   required
+                  placeholder="Your full name"
                 />
               </div>
               
@@ -185,6 +203,7 @@ export function InquiryForm({ templateId }) {
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   required
+                  placeholder="your.email@example.com"
                 />
               </div>
             </div>
@@ -196,6 +215,7 @@ export function InquiryForm({ templateId }) {
                   id="company"
                   value={formData.company}
                   onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
+                  placeholder="Your company name"
                 />
               </div>
               
@@ -237,7 +257,7 @@ export function InquiryForm({ templateId }) {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Tell me what you're trying to achieve..."
+                placeholder="Tell me what you're trying to achieve, what problems you're solving, and what success looks like..."
                 rows={4}
                 required
               />
@@ -315,6 +335,12 @@ export function InquiryForm({ templateId }) {
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
           </Button>
+          
+          {isSubmitting && (
+            <p className="text-sm text-center text-gray-500">
+              Submitting your inquiry... Please wait.
+            </p>
+          )}
         </form>
       </CardContent>
     </Card>

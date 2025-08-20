@@ -39,5 +39,23 @@
     "templateId": null,
     "status": "accepted",
     "reviewedAt": "2025-08-14T00:15:50.363Z"
+  },
+  {
+    "id": "inquiry-1755719767705-a42kc5f61",
+    "createdAt": "2025-08-20T19:56:07.705Z",
+    "name": "Test User",
+    "email": "test@example.com",
+    "company": null,
+    "phone": null,
+    "services": [
+      "Custom Dashboard",
+      "Workflow Automation"
+    ],
+    "description": "Test project description",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "desiredDate": null,
+    "templateId": null,
+    "status": "new"
   }
 ]
