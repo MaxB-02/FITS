@@ -8,55 +8,87 @@ export const dynamic = 'force-dynamic';
 import { getAllProjects } from '@/lib/portfolio.js';
 
 export default async function AdminDashboardPage() {
-  // Fetch data with error handling - if any fail, use empty arrays
+  // Initialize with empty arrays as fallbacks
   let inquiries = [];
   let templates = [];
   let projects = [];
   
+  // Try to fetch data, but never let it crash the page
   try {
-    [inquiries, templates, projects] = await Promise.all([
-      getAllInquiries().catch(() => []),
-      getAllTemplates().catch(() => []),
-      getAllProjects().catch(() => [])
-    ]);
+    // Fetch each data source individually with error handling
+    try {
+      inquiries = await getAllInquiries();
+      console.log('Inquiries loaded:', inquiries?.length || 0);
+    } catch (error) {
+      console.error('Failed to load inquiries:', error);
+      inquiries = [];
+    }
+    
+    try {
+      templates = await getAllTemplates();
+      console.log('Templates loaded:', templates?.length || 0);
+    } catch (error) {
+      console.error('Failed to load templates:', error);
+      templates = [];
+    }
+    
+    try {
+      projects = await getAllProjects();
+      console.log('Projects loaded:', projects?.length || 0);
+    } catch (error) {
+      console.error('Failed to load projects:', error);
+      projects = [];
+    }
   } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    // Continue with empty arrays if all fail
+    console.error('Critical error in admin dashboard:', error);
+    // Continue with empty arrays
   }
+  
+  // Ensure we have arrays and safe defaults
+  if (!Array.isArray(inquiries)) inquiries = [];
+  if (!Array.isArray(templates)) templates = [];
+  if (!Array.isArray(projects)) projects = [];
 
-  // Calculate stats with error handling
+  // Calculate stats with maximum safety
   const stats = {
-    total: Array.isArray(inquiries) ? inquiries.length : 0,
-    new: Array.isArray(inquiries) ? inquiries.filter(inq => inq && inq.status === 'new').length : 0,
-    accepted: Array.isArray(inquiries) ? inquiries.filter(inq => inq && inq.status === 'accepted').length : 0,
-    declined: Array.isArray(inquiries) ? inquiries.filter(inq => inq && inq.status === 'declined').length : 0
+    total: inquiries.length || 0,
+    new: inquiries.filter(inq => inq && inq.status === 'new').length || 0,
+    accepted: inquiries.filter(inq => inq && inq.status === 'accepted').length || 0,
+    declined: inquiries.filter(inq => inq && inq.status === 'declined').length || 0
   };
 
-  // Get recent inquiries (last 5) with error handling
-  const recentInquiries = Array.isArray(inquiries) ? inquiries.slice(0, 5) : [];
+  // Get recent inquiries (last 5) with safety checks
+  const recentInquiries = inquiries.slice(0, 5).filter(inq => inq && inq.id);
 
   const formatDate = (dateString) => {
     try {
       if (!dateString) return 'N/A';
-      return new Date(dateString).toLocaleDateString('en-US', {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      
+      return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
       });
     } catch (error) {
+      console.error('Date formatting error:', error);
       return 'Invalid Date';
     }
   };
 
   const getStatusBadge = (status) => {
-    const variants = {
-      new: 'default',
-      accepted: 'secondary',
-      declined: 'destructive'
-    };
-
-    return variants[status] || 'default';
+    try {
+      const variants = {
+        new: 'default',
+        accepted: 'secondary',
+        declined: 'destructive'
+      };
+      return variants[status] || 'default';
+    } catch (error) {
+      return 'default';
+    }
   };
 
   return (
@@ -200,7 +232,7 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-emerald-600">
-              {Array.isArray(templates) ? templates.length : 0}
+              {templates.length || 0}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Active templates
@@ -217,9 +249,9 @@ export default async function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-blue-600">
-              {Array.isArray(projects) ? projects.length : 0}
+              {projects.length || 0}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground">
               Portfolio projects
             </p>
           </CardContent>
@@ -240,26 +272,30 @@ export default async function AdminDashboardPage() {
               <p className="text-muted-foreground text-center py-4">No inquiries yet</p>
             ) : (
               <div className="space-y-3">
-                {recentInquiries.map((inquiry) => (
-                  <div key={inquiry.id} className="flex items-center justify-between text-sm">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{inquiry.name}</p>
-                      <p className="text-muted-foreground text-xs">{inquiry.email}</p>
-                    </div>
-                    <div className="text-right ml-4">
-                      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        inquiry.status === 'new' ? 'bg-blue-100 text-blue-800' :
-                        inquiry.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {inquiry.status}
+                {recentInquiries.map((inquiry) => {
+                  if (!inquiry || !inquiry.id) return null;
+                  
+                  return (
+                    <div key={inquiry.id} className="flex items-center justify-between text-sm">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{inquiry.name || 'Unnamed'}</p>
+                        <p className="text-muted-foreground text-xs">{inquiry.email || 'No email'}</p>
                       </div>
-                      <p className="text-muted-foreground text-xs mt-1">
-                        {formatDate(inquiry.createdAt)}
-                      </p>
+                      <div className="text-right ml-4">
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          inquiry.status === 'new' ? 'bg-blue-100 text-blue-800' :
+                          inquiry.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {inquiry.status || 'unknown'}
+                        </div>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          {formatDate(inquiry.createdAt)}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
@@ -273,23 +309,27 @@ export default async function AdminDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {!Array.isArray(templates) || templates.length === 0 ? (
+            {templates.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">No templates yet</p>
             ) : (
               <div className="space-y-3">
-                {templates.slice(0, 5).map((template) => (
-                  <div key={template.id} className="flex items-center justify-between text-sm">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{template.name}</p>
-                      <p className="text-muted-foreground text-xs">${template.price}</p>
+                {templates.slice(0, 5).map((template) => {
+                  if (!template || !template.id) return null;
+                  
+                  return (
+                    <div key={template.id} className="flex items-center justify-between text-sm">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{template.name || 'Unnamed Template'}</p>
+                        <p className="text-muted-foreground text-xs">${template.price || 0}</p>
+                      </div>
+                      <div className="text-right ml-4">
+                        <p className="text-muted-foreground text-xs">
+                          {formatDate(template.updatedAt)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right ml-4">
-                      <p className="text-muted-foreground text-xs">
-                        {formatDate(template.updatedAt)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>
