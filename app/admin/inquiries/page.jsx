@@ -12,7 +12,19 @@ export default async function AdminInquiriesPage() {
   noStore();
   
   // Fetch inquiries directly on the server (same as dashboard)
-  const inquiries = await getAllInquiries();
+  let inquiries = [];
+  try {
+    inquiries = await getAllInquiries();
+    console.log('Inquiries loaded:', inquiries?.length || 0);
+  } catch (error) {
+    console.error('Failed to load inquiries:', error);
+    inquiries = [];
+  }
+  
+  // Ensure we have an array
+  if (!Array.isArray(inquiries)) {
+    inquiries = [];
+  }
 
   return (
     <div>
@@ -49,8 +61,14 @@ export default async function AdminInquiriesPage() {
         </Card>
       ) : (
         <div className="space-y-4">
-          {inquiries.map((inquiry) => (
-            <Card key={inquiry.id}>
+          {inquiries.map((inquiry) => {
+            // Skip malformed inquiry objects
+            if (!inquiry || !inquiry.id) {
+              return null;
+            }
+            
+            return (
+              <Card key={inquiry.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -231,7 +249,8 @@ export default async function AdminInquiriesPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
