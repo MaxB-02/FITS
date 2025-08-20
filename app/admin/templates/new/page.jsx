@@ -31,9 +31,29 @@ export default function NewTemplatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!formData.name.trim()) {
+      alert('Template name is required');
+      return;
+    }
+    if (!formData.shortDesc.trim()) {
+      alert('Short description is required');
+      return;
+    }
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      alert('Price must be a positive number');
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
+      console.log('Submitting template data:', formData);
+      
+      // Generate a unique ID for the template
+      const templateId = `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       const response = await fetch('/api/admin/templates', {
         method: 'POST',
         headers: {
@@ -41,19 +61,32 @@ export default function NewTemplatePage() {
         },
         body: JSON.stringify({
           ...formData,
+          id: templateId,
           price: parseFloat(formData.price) || 0
         }),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (response.ok) {
+        const result = await response.json();
+        console.log('Template created successfully:', result);
         router.push('/admin/templates');
       } else {
-        const error = await response.json();
-        alert(`Error: ${error.message}`);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        
+        try {
+          const error = JSON.parse(errorText);
+          alert(`Error: ${error.message || error.error || 'Unknown error'}`);
+        } catch (parseError) {
+          alert(`Error ${response.status}: ${errorText}`);
+        }
       }
     } catch (error) {
-      console.error('Error creating template:', error);
-      alert('An error occurred while creating the template');
+      console.error('Network or other error:', error);
+      alert(`Network error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }

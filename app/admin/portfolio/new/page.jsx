@@ -36,26 +36,52 @@ export default function NewPortfolioPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!formData.title.trim()) {
+      alert('Project title is required');
+      return;
+    }
+    if (!formData.shortDesc.trim()) {
+      alert('Short description is required');
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
+      // Generate a unique ID for the project
+      const projectId = `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
       const response = await fetch('/api/admin/portfolio', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          id: projectId
+        }),
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log('Project created successfully:', result);
         router.push('/admin/portfolio');
       } else {
-        const error = await response.json();
-        alert(`Error: ${error.message}`);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        
+        try {
+          const error = JSON.parse(errorText);
+          alert(`Error: ${error.message || error.error || 'Unknown error'}`);
+        } catch (parseError) {
+          alert(`Error ${response.status}: ${errorText}`);
+        }
       }
     } catch (error) {
-      console.error('Error creating project:', error);
-      alert('An error occurred while creating the project');
+      console.error('Network or other error:', error);
+      alert(`Network error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
