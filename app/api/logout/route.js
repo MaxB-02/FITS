@@ -7,9 +7,22 @@ export async function POST(request) {
     // Redirect to homepage on same origin as request
     const origin = new URL(request.url).origin;
     const response = NextResponse.redirect(new URL('/', origin));
-    // Clear session cookie via platform API
+    // Clear session cookie via platform API - multiple approaches to ensure it's cleared
     response.cookies.set('session', '', {
       maxAge: 0,
+      expires: new Date(0),
+      path: '/',
+      sameSite: 'lax',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production'
+    });
+    
+    // Also try to clear with different attributes to ensure compatibility
+    response.cookies.set({
+      name: 'session',
+      value: '',
+      maxAge: 0,
+      expires: new Date(0),
       path: '/',
       sameSite: 'lax',
       httpOnly: true,
@@ -24,6 +37,19 @@ export async function POST(request) {
     const res = NextResponse.redirect(new URL('/', origin));
     res.cookies.set('session', '', {
       maxAge: 0,
+      expires: new Date(0),
+      path: '/',
+      sameSite: 'lax',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production'
+    });
+    
+    // Also try to clear with different attributes
+    res.cookies.set({
+      name: 'session',
+      value: '',
+      maxAge: 0,
+      expires: new Date(0),
       path: '/',
       sameSite: 'lax',
       httpOnly: true,

@@ -11,17 +11,12 @@ export default function AdminLayout({ children }) {
   const handleLogout = async () => {
     try {
       const response = await fetch('/api/logout', { method: 'POST' });
-      if (response.redirected) {
-        // If the API redirects, follow it
-        window.location.href = response.url;
-      } else {
-        // Fallback: redirect to homepage
-        router.push('/');
-      }
+      // Always force a full page reload to ensure session is cleared
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
-      // Fallback: redirect to homepage
-      router.push('/');
+      // Fallback: force full page reload to homepage
+      window.location.href = '/';
     }
   };
 

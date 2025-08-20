@@ -6,8 +6,8 @@ export function middleware(request) {
   
   // Protect admin routes
   if (pathname.startsWith('/admin') || pathname.startsWith('/api/admin')) {
-    // Allow login and logout routes
-    if (pathname === '/login' || pathname === '/api/login' || pathname === '/api/logout') {
+    // Allow login routes but NOT logout routes (logout should require auth)
+    if (pathname === '/login' || pathname === '/api/login') {
       return NextResponse.next();
     }
     
