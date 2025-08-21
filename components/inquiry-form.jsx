@@ -44,13 +44,6 @@ export function InquiryForm({ templateId }) {
     }
   }, [templateId]);
 
-  // Debug logging when component mounts
-  useEffect(() => {
-    console.log('🎯 InquiryForm component mounted');
-    console.log('📊 Initial form data:', formData);
-    console.log('🔧 Template ID:', templateId);
-  }, []);
-
   const handleServiceChange = (service) => {
     setFormData(prev => ({
       ...prev,
@@ -63,32 +56,12 @@ export function InquiryForm({ templateId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Add immediate feedback to test if the function is being called
-    console.log('🚀 Form submission started');
-    console.log('📋 Event object:', e);
-    console.log('📝 Form data:', formData);
-    alert('Form submission started! Check console for details.');
-    
     if (isSubmitting) {
-      console.log('❌ Already submitting, returning early');
       return;
     }
     
-    // Log all form data for debugging
-    console.log('🔍 Form validation check:');
-    console.log('- Name:', formData.name, 'Valid:', !!formData.name);
-    console.log('- Email:', formData.email, 'Valid:', !!formData.email);
-    console.log('- Description:', formData.description, 'Valid:', !!formData.description);
-    console.log('- Services:', formData.services);
-    console.log('- Budget Low:', formData.budgetLow);
-    console.log('- Budget High:', formData.budgetHigh);
-    
     // Basic validation
     if (!formData.name || !formData.email || !formData.description) {
-      console.log('❌ Validation failed: missing required fields');
-      console.log('- Missing name:', !formData.name);
-      console.log('- Missing email:', !formData.email);
-      console.log('- Missing description:', !formData.description);
       try {
         toast({
           title: "Validation Error",
@@ -104,7 +77,6 @@ export function InquiryForm({ templateId }) {
 
     // Budget validation
     if (formData.budgetLow && formData.budgetHigh && parseFloat(formData.budgetLow) > parseFloat(formData.budgetHigh)) {
-      console.log('❌ Validation failed: budget high < budget low');
       try {
         toast({
           title: "Validation Error",
@@ -119,7 +91,6 @@ export function InquiryForm({ templateId }) {
     }
 
     setIsSubmitting(true);
-    console.log('✅ Form validation passed, submitting...');
 
     try {
       // Create FormData for file upload
@@ -146,30 +117,17 @@ export function InquiryForm({ templateId }) {
       const fileInput = document.getElementById('fileUpload');
       if (fileInput && fileInput.files[0]) {
         submitData.append('file', fileInput.files[0]);
-        console.log('📁 File attached:', fileInput.files[0].name);
       }
 
-      console.log('📤 Submitting form data to /api/inquire');
-      console.log('🔗 URL:', window.location.origin + '/api/inquire');
-      
       const response = await fetch('/api/inquire', {
         method: 'POST',
         body: submitData, // Don't set Content-Type header for FormData
       });
 
-      console.log('📥 Response received:', response);
-      console.log('📊 Response status:', response.status);
-      console.log('✅ Response ok:', response.ok);
-      console.log('📋 Response headers:', Object.fromEntries(response.headers.entries()));
-
       if (response.ok) {
         const result = await response.json();
-        console.log('📄 Response data:', result);
         
         if (result.success) {
-          console.log('🎉 Success! Redirecting to thank-you page');
-          
-          // Show success toast
           try {
             toast({
               title: "Success!",
@@ -217,7 +175,6 @@ export function InquiryForm({ templateId }) {
       }
     } finally {
       setIsSubmitting(false);
-      console.log('🏁 Form submission finished');
     }
   };
 
@@ -230,45 +187,6 @@ export function InquiryForm({ templateId }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {/* Test button to debug form submission */}
-        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
-          <p className="text-sm text-yellow-800 mb-2">Debug: Test form submission function</p>
-          <button
-            type="button"
-            onClick={() => {
-              console.log('🧪 Test button clicked');
-              alert('Test button clicked! Check console.');
-            }}
-            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm mr-2"
-          >
-            Test Form Function
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              console.log('🧪 Manual form submission test');
-              // Fill in some test data
-              setFormData({
-                name: 'Test User',
-                email: 'test@example.com',
-                company: 'Test Company',
-                phone: '123-456-7890',
-                services: ['Custom Dashboard'],
-                description: 'Test project description',
-                hasExistingSystem: false,
-                budgetLow: '500',
-                budgetHigh: '2000',
-                desiredDate: '2025-12-31',
-                templateId: templateId || ''
-              });
-              alert('Test data filled! Now try submitting the form.');
-            }}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-          >
-            Fill Test Data
-          </button>
-        </div>
-        
         <form id="inquiryForm" onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Basic Information</h3>

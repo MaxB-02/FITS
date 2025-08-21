@@ -140,6 +140,9 @@ export async function POST(request) {
     try {
       console.log('Attempting to save inquiry to leads.json');
       console.log('Current working directory:', process.cwd());
+      console.log('Environment variables:');
+      console.log('- DATA_DIR:', process.env.DATA_DIR);
+      console.log('- NODE_ENV:', process.env.NODE_ENV);
       
       const leadsPath = path.isAbsolute(dataDir)
         ? path.join(dataDir, 'leads.json')
@@ -160,13 +163,59 @@ export async function POST(request) {
       
     } catch (error) {
       console.error('Error saving inquiry:', error);
-      return new Response(
-        JSON.stringify({ error: 'Failed to save inquiry to database' }),
-        { 
-          status: 500,
-          headers: { 'Content-Type': 'application/json' }
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      // Try fallback: save to /tmp if primary location fails
+      try {
+        console.log('🔄 Trying fallback: saving to /tmp directory');
+        const fallbackPath = '/tmp/leads.json';
+        let fallbackLeads = [];
+        
+        try {
+          fallbackLeads = await readJSON(fallbackPath);
+        } catch (readError) {
+          console.log('📝 Creating new fallback leads file');
         }
-      );
+        
+        fallbackLeads.push(inquiry);
+        await writeJSON(fallbackPath, fallbackLeads);
+        
+        console.log('✅ Successfully saved inquiry to fallback location:', fallbackPath);
+        
+        // Revalidate admin paths
+        revalidatePath('/admin');
+        revalidatePath('/admin/inquiries');
+        
+      } catch (fallbackError) {
+        console.error('❌ Fallback also failed:', fallbackError);
+        
+        // Provide more specific error messages
+        let errorMessage = 'Failed to save inquiry to database';
+        if (error.code === 'EACCES') {
+          errorMessage = 'Permission denied: Cannot write to database directory';
+        } else if (error.code === 'ENOSPC') {
+          errorMessage = 'No space left on device';
+        } else if (error.code === 'EROFS') {
+          errorMessage = 'Read-only file system: Cannot write to database';
+        }
+        
+        return new Response(
+          JSON.stringify({ 
+            error: errorMessage,
+            details: error.message,
+            code: error.code,
+            fallbackError: fallbackError.message
+          }),
+          { 
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
     }
 
     // Send email notification (if configured)
