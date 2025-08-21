@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Package, MessageSquare, BarChart3, ArrowLeft, FolderOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Toaster } from '@/components/ui/toaster';
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
@@ -95,6 +96,9 @@ export default function AdminLayout({ children }) {
       <main className="container mx-auto px-4 py-8">
         {children}
       </main>
+      
+      {/* Toast notifications */}
+      <Toaster />
     </div>
   );
 } 
