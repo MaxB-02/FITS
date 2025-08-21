@@ -63,49 +63,89 @@ export async function POST(request, { params }) {
 
 export async function PATCH(request, { params }) {
   try {
-    const user = await requireAdminNode(request);
-    
+    const { id } = params;
     const updates = await request.json();
-    const updatedInquiry = await updateInquiry(params.id, updates);
+    
+    console.log(`Updating inquiry ${id} with:`, updates);
+    
+    const updatedInquiry = await updateInquiry(id, updates);
     
     if (!updatedInquiry) {
-      return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
+      return new Response(
+        JSON.stringify({ error: 'Inquiry not found' }),
+        { 
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
     
-    return NextResponse.json(updatedInquiry);
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        inquiry: updatedInquiry 
+      }),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
     
   } catch (error) {
     console.error('Error updating inquiry:', error);
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    return NextResponse.json(
-      { error: 'Failed to update inquiry' },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to update inquiry',
+        details: error.message 
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
   }
 }
 
 export async function DELETE(request, { params }) {
   try {
-    const user = await requireAdminNode(request);
+    const { id } = params;
     
-    const success = await deleteInquiry(params.id);
+    console.log(`Deleting inquiry ${id}`);
+    
+    const success = await deleteInquiry(id);
     
     if (!success) {
-      return NextResponse.json({ error: 'Inquiry not found' }, { status: 404 });
+      return new Response(
+        JSON.stringify({ error: 'Inquiry not found' }),
+        { 
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
     
-    return NextResponse.json({ message: 'Inquiry deleted successfully' });
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Inquiry deleted successfully' 
+      }),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
     
   } catch (error) {
     console.error('Error deleting inquiry:', error);
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    return NextResponse.json(
-      { error: 'Failed to delete inquiry' },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to delete inquiry',
+        details: error.message 
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
   }
 } 

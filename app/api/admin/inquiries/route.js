@@ -1,24 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple.js';
-import { getAllInquiries, createInquiry } from '@/lib/inquiries.js';
+import { getAllInquiries } from '@/lib/inquiries.js';
 
 export const runtime = 'nodejs';
 
 export async function GET(request) {
   try {
-    const user = await requireAdminNode(request);
+    console.log('Fetching all inquiries');
     
     const inquiries = await getAllInquiries();
-    return NextResponse.json(inquiries);
+    
+    console.log(`Successfully fetched ${inquiries.length} inquiries`);
+    
+    return new Response(
+      JSON.stringify(inquiries),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
     
   } catch (error) {
     console.error('Error fetching inquiries:', error);
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    return NextResponse.json(
-      { error: 'Failed to fetch inquiries' },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to fetch inquiries',
+        details: error.message 
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
   }
 }

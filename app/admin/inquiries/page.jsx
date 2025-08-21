@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAllInquiries, updateInquiry, deleteInquiry } from '@/lib/inquiries.js';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,8 +22,13 @@ export default function AdminInquiriesPage() {
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      const data = await getAllInquiries();
-      setInquiries(data);
+      const response = await fetch('/api/admin/inquiries');
+      if (response.ok) {
+        const data = await response.json();
+        setInquiries(data);
+      } else {
+        throw new Error('Failed to fetch inquiries');
+      }
     } catch (error) {
       console.error('Failed to load inquiries:', error);
       toast({
@@ -41,22 +45,34 @@ export default function AdminInquiriesPage() {
     try {
       setUpdating(prev => ({ ...prev, [inquiryId]: true }));
       
-      const updatedInquiry = await updateInquiry(inquiryId, { 
-        status: newStatus,
-        reviewedAt: new Date().toISOString()
+      const response = await fetch(`/api/admin/inquiries/${inquiryId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          status: newStatus,
+          reviewedAt: new Date().toISOString()
+        })
       });
       
-      if (updatedInquiry) {
-        setInquiries(prev => 
-          prev.map(inq => 
-            inq.id === inquiryId ? updatedInquiry : inq
-          )
-        );
+      if (response.ok) {
+        const result = await response.json();
         
-        toast({
-          title: "Success",
-          description: `Inquiry ${newStatus} successfully.`,
-        });
+        if (result.success) {
+          setInquiries(prev => 
+            prev.map(inq => 
+              inq.id === inquiryId ? result.inquiry : inq
+            )
+          );
+          
+          toast({
+            title: "Success",
+            description: `Inquiry ${newStatus} successfully.`,
+          });
+        }
+      } else {
+        throw new Error('Failed to update inquiry');
       }
     } catch (error) {
       console.error(`Error updating inquiry status:`, error);
@@ -78,15 +94,23 @@ export default function AdminInquiriesPage() {
     try {
       setUpdating(prev => ({ ...prev, [inquiryId]: true }));
       
-      const success = await deleteInquiry(inquiryId);
+      const response = await fetch(`/api/admin/inquiries/${inquiryId}`, {
+        method: 'DELETE',
+      });
       
-      if (success) {
-        setInquiries(prev => prev.filter(inq => inq.id !== inquiryId));
+      if (response.ok) {
+        const result = await response.json();
         
-        toast({
-          title: "Success",
-          description: "Inquiry deleted successfully.",
-        });
+        if (result.success) {
+          setInquiries(prev => prev.filter(inq => inq.id !== inquiryId));
+          
+          toast({
+            title: "Success",
+            description: "Inquiry deleted successfully.",
+          });
+        }
+      } else {
+        throw new Error('Failed to delete inquiry');
       }
     } catch (error) {
       console.error('Error deleting inquiry:', error);
