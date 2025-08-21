@@ -70,37 +70,57 @@ export async function POST(request) {
       };
     } else {
       // Handle JSON data
-      inquiryData = await request.json();
-      
-      // Ensure templateId is included
-      if (!inquiryData.templateId) {
-        inquiryData.templateId = null;
+      try {
+        inquiryData = await request.json();
+        
+        // Ensure templateId is included
+        if (!inquiryData.templateId) {
+          inquiryData.templateId = null;
+        }
+      } catch (parseError) {
+        console.error('Error parsing JSON request:', parseError);
+        return new Response(
+          JSON.stringify({ error: 'Invalid JSON data' }),
+          { 
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
       }
     }
 
     // Basic validation
     if (!inquiryData.name || !inquiryData.email || !inquiryData.description) {
-      return NextResponse.json(
-        { error: 'Missing required fields: name, email, description' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: name, email, description' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(inquiryData.email)) {
-      return NextResponse.json(
-        { error: 'Invalid email address' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
     // Budget validation
     if (inquiryData.budgetLow && inquiryData.budgetHigh && 
         parseFloat(inquiryData.budgetLow) > parseFloat(inquiryData.budgetHigh)) {
-      return NextResponse.json(
-        { error: 'Budget high must be greater than or equal to budget low' },
-        { status: 400 }
+      return new Response(
+        JSON.stringify({ error: 'Budget high must be greater than or equal to budget low' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -140,9 +160,12 @@ export async function POST(request) {
       
     } catch (error) {
       console.error('Error saving inquiry:', error);
-      return NextResponse.json(
-        { error: 'Failed to save inquiry to database' },
-        { status: 500 }
+      return new Response(
+        JSON.stringify({ error: 'Failed to save inquiry to database' }),
+        { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
 
@@ -177,18 +200,30 @@ export async function POST(request) {
       }
     }
 
-    // Redirect to thank-you page
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Inquiry submitted successfully',
-      inquiryId: inquiry.id
-    });
+    // Return success response
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        message: 'Inquiry submitted successfully',
+        inquiryId: inquiry.id
+      }),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
 
   } catch (error) {
     console.error('Error processing inquiry:', error);
-    return NextResponse.json({ 
-      error: 'Failed to process inquiry',
-      details: error.message 
-    }, { status: 500 });
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to process inquiry',
+        details: error.message 
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   }
 } 
