@@ -44,6 +44,13 @@ export function InquiryForm({ templateId }) {
     }
   }, [templateId]);
 
+  // Debug logging when component mounts
+  useEffect(() => {
+    console.log('🎯 InquiryForm component mounted');
+    console.log('📊 Initial form data:', formData);
+    console.log('🔧 Template ID:', templateId);
+  }, []);
+
   const handleServiceChange = (service) => {
     setFormData(prev => ({
       ...prev,
@@ -56,30 +63,58 @@ export function InquiryForm({ templateId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (isSubmitting) return;
-    
+    // Add immediate feedback to test if the function is being called
     console.log('🚀 Form submission started');
+    console.log('📋 Event object:', e);
     console.log('📝 Form data:', formData);
+    alert('Form submission started! Check console for details.');
+    
+    if (isSubmitting) {
+      console.log('❌ Already submitting, returning early');
+      return;
+    }
+    
+    // Log all form data for debugging
+    console.log('🔍 Form validation check:');
+    console.log('- Name:', formData.name, 'Valid:', !!formData.name);
+    console.log('- Email:', formData.email, 'Valid:', !!formData.email);
+    console.log('- Description:', formData.description, 'Valid:', !!formData.description);
+    console.log('- Services:', formData.services);
+    console.log('- Budget Low:', formData.budgetLow);
+    console.log('- Budget High:', formData.budgetHigh);
     
     // Basic validation
     if (!formData.name || !formData.email || !formData.description) {
       console.log('❌ Validation failed: missing required fields');
-      toast({
-        title: "Validation Error",
-        description: "Please fill in all required fields (Name, Email, and Description).",
-        variant: "destructive"
-      });
+      console.log('- Missing name:', !formData.name);
+      console.log('- Missing email:', !formData.email);
+      console.log('- Missing description:', !formData.description);
+      try {
+        toast({
+          title: "Validation Error",
+          description: "Please fill in all required fields (Name, Email, and Description).",
+          variant: "destructive"
+        });
+      } catch (toastError) {
+        console.error('Toast error:', toastError);
+        alert("Please fill in all required fields (Name, Email, and Description).");
+      }
       return;
     }
 
     // Budget validation
     if (formData.budgetLow && formData.budgetHigh && parseFloat(formData.budgetLow) > parseFloat(formData.budgetHigh)) {
       console.log('❌ Validation failed: budget high < budget low');
-      toast({
-        title: "Validation Error",
-        description: "Budget high must be greater than or equal to budget low.",
-        variant: "destructive"
-      });
+      try {
+        toast({
+          title: "Validation Error",
+          description: "Budget high must be greater than or equal to budget low.",
+          variant: "destructive"
+        });
+      } catch (toastError) {
+        console.error('Toast error:', toastError);
+        alert("Budget high must be greater than or equal to budget low.");
+      }
       return;
     }
 
@@ -135,14 +170,25 @@ export function InquiryForm({ templateId }) {
           console.log('🎉 Success! Redirecting to thank-you page');
           
           // Show success toast
-          toast({
-            title: "Success!",
-            description: "Your inquiry has been submitted successfully. Redirecting...",
-          });
+          try {
+            toast({
+              title: "Success!",
+              description: "Your inquiry has been submitted successfully. Redirecting...",
+            });
+          } catch (toastError) {
+            console.error('Toast error:', toastError);
+            alert("Success! Your inquiry has been submitted successfully. Redirecting...");
+          }
           
           // Wait a moment for the toast to show, then redirect
           setTimeout(() => {
-            router.push('/thank-you');
+            try {
+              router.push('/thank-you');
+            } catch (routerError) {
+              console.error('Router error:', routerError);
+              // Fallback: use window.location
+              window.location.href = '/thank-you';
+            }
           }, 1500);
         } else {
           throw new Error(result.error || 'Failed to submit inquiry');
@@ -159,11 +205,16 @@ export function InquiryForm({ templateId }) {
       }
     } catch (error) {
       console.error('💥 Error submitting inquiry:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to submit inquiry. Please try again.",
-        variant: "destructive"
-      });
+      try {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to submit inquiry. Please try again.",
+          variant: "destructive"
+        });
+      } catch (toastError) {
+        console.error('Toast error:', toastError);
+        alert(`Error: ${error.message || "Failed to submit inquiry. Please try again."}`);
+      }
     } finally {
       setIsSubmitting(false);
       console.log('🏁 Form submission finished');
@@ -179,7 +230,46 @@ export function InquiryForm({ templateId }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Test button to debug form submission */}
+        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded-lg">
+          <p className="text-sm text-yellow-800 mb-2">Debug: Test form submission function</p>
+          <button
+            type="button"
+            onClick={() => {
+              console.log('🧪 Test button clicked');
+              alert('Test button clicked! Check console.');
+            }}
+            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm mr-2"
+          >
+            Test Form Function
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              console.log('🧪 Manual form submission test');
+              // Fill in some test data
+              setFormData({
+                name: 'Test User',
+                email: 'test@example.com',
+                company: 'Test Company',
+                phone: '123-456-7890',
+                services: ['Custom Dashboard'],
+                description: 'Test project description',
+                hasExistingSystem: false,
+                budgetLow: '500',
+                budgetHigh: '2000',
+                desiredDate: '2025-12-31',
+                templateId: templateId || ''
+              });
+              alert('Test data filled! Now try submitting the form.');
+            }}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+          >
+            Fill Test Data
+          </button>
+        </div>
+        
+        <form id="inquiryForm" onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Basic Information</h3>
             
@@ -188,6 +278,7 @@ export function InquiryForm({ templateId }) {
                 <Label htmlFor="name">Name *</Label>
                 <Input
                   id="name"
+                  name="name"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   required
@@ -199,6 +290,7 @@ export function InquiryForm({ templateId }) {
                 <Label htmlFor="email">Email *</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
@@ -255,6 +347,7 @@ export function InquiryForm({ templateId }) {
               <Label htmlFor="description">Describe your project *</Label>
               <Textarea
                 id="description"
+                name="description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Tell me what you're trying to achieve, what problems you're solving, and what success looks like..."
@@ -333,7 +426,14 @@ export function InquiryForm({ templateId }) {
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
+            {isSubmitting ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span>Submitting...</span>
+              </div>
+            ) : (
+              'Submit Inquiry'
+            )}
           </Button>
           
           {isSubmitting && (

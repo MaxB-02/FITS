@@ -57,5 +57,70 @@
     "desiredDate": null,
     "templateId": null,
     "status": "new"
+  },
+  {
+    "id": "inquiry-1755794877267-dtyurwn9w",
+    "createdAt": "2025-08-21T16:47:57.267Z",
+    "name": "Test User",
+    "email": "test@example.com",
+    "company": null,
+    "phone": null,
+    "services": [
+      "Custom Dashboard"
+    ],
+    "description": "Test project description",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "desiredDate": null,
+    "templateId": null,
+    "status": "new"
+  },
+  {
+    "id": "inquiry-1755795987081-57u7vts3i",
+    "createdAt": "2025-08-21T17:06:27.081Z",
+    "name": "Test User",
+    "email": "test@example.com",
+    "description": "Test project",
+    "templateId": null,
+    "status": "new"
+  },
+  {
+    "id": "inquiry-1755796068431-lnaelmgg3",
+    "createdAt": "2025-08-21T17:07:48.431Z",
+    "name": "Test User 2",
+    "email": "test2@example.com",
+    "company": null,
+    "phone": null,
+    "services": [
+      "Custom Dashboard",
+      "Data Processing"
+    ],
+    "description": "Another test project",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "budgetLow": 500,
+    "budgetHigh": 2000,
+    "desiredDate": null,
+    "templateId": null,
+    "status": "new"
+  },
+  {
+    "id": "inquiry-1755796274149-jxb217166",
+    "createdAt": "2025-08-21T17:11:14.149Z",
+    "name": "Test User 222",
+    "email": "test@example.com",
+    "company": "Test Company",
+    "phone": "123-456-7890",
+    "services": [
+      "Custom Dashboard"
+    ],
+    "description": "Test project description",
+    "hasExistingSystem": false,
+    "filePath": null,
+    "budgetLow": 500,
+    "budgetHigh": 2000,
+    "desiredDate": "2025-12-31",
+    "templateId": null,
+    "status": "new"
   }
 ]
