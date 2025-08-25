@@ -57,6 +57,12 @@ export default async function AdminDashboardPage() {
     declined: inquiries.filter(inq => inq && inq.status === 'declined').length || 0
   };
 
+  // Calculate template stats
+  const templateStats = {
+    total: templates.length || 0,
+    active: templates.filter(t => t && t.active !== false).length || 0
+  };
+
   // Get recent inquiries (last 5) with safety checks
   const recentInquiries = inquiries.slice(0, 5).filter(inq => inq && inq.id);
 
@@ -225,21 +231,41 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
-            <CardTitle>Template Count</CardTitle>
+            <CardTitle>Total Templates</CardTitle>
             <CardDescription>
-              Total available templates
+              All templates in the system
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-emerald-600">
-              {templates.length || 0}
+              {templateStats.total}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Total templates
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Templates</CardTitle>
+            <CardDescription>
+              Templates currently active
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-emerald-600">
+              {templateStats.active}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               Active templates
             </p>
           </CardContent>
         </Card>
+      </div>
 
+      {/* Portfolio Count */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <Card>
           <CardHeader>
             <CardTitle>Portfolio Projects</CardTitle>

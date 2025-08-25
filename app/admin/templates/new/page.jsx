@@ -21,6 +21,8 @@ export default function NewTemplatePage() {
     shortDesc: '',
     longDesc: '',
     cover: '',
+    previewUrl: '',
+    buyUrl: '',
     features: [],
     useCases: [],
     active: true
@@ -200,6 +202,26 @@ export default function NewTemplatePage() {
                   value={formData.cover}
                   onChange={(e) => setFormData(prev => ({ ...prev, cover: e.target.value }))}
                   placeholder="https://example.com/image.jpg"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="previewUrl">Preview URL</Label>
+                <Input
+                  id="previewUrl"
+                  value={formData.previewUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, previewUrl: e.target.value }))}
+                  placeholder="https://example.com/preview (optional)"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="buyUrl">Buy URL</Label>
+                <Input
+                  id="buyUrl"
+                  value={formData.buyUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, buyUrl: e.target.value }))}
+                  placeholder="https://example.com/buy (optional)"
                 />
               </div>
             </CardContent>

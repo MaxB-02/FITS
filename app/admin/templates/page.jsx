@@ -1,11 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { getAllTemplates } from '@/lib/templates.js';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Package } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
 
 export default async function AdminTemplatesPage() {
   // Fetch templates directly on the server with bulletproof error handling

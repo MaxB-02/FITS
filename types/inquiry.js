@@ -4,24 +4,23 @@ import { z } from 'zod';
  * Zod schema for inquiry validation
  */
 export const InquirySchema = z.object({
+  id: z.string().optional(), // Will be generated
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Valid email is required'),
   company: z.string().optional(),
-  phone: z.string().optional().refine(
-    (val) => !val || val.length >= 10,
-    'Phone number must be at least 10 digits'
-  ),
+  phone: z.string().optional(),
   services: z.array(z.string()).optional().default([]),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   hasExistingSystem: z.boolean().optional().default(false),
+  sheetUrl: z.string().optional(),
   filePath: z.string().optional(),
   budgetLow: z.number().positive('Budget low must be a positive number').optional(),
   budgetHigh: z.number().positive('Budget high must be a positive number').optional(),
   desiredDate: z.string().optional(),
-  status: z.enum(['new', 'checked', 'dropped']).default('new'),
-  checkedAt: z.string().datetime().optional(),
-  droppedAt: z.string().datetime().optional(),
-  meta: z.record(z.any()).optional()
+  templateId: z.string().optional(),
+  status: z.enum(['new', 'accepted', 'declined']).default('new'),
+  createdAt: z.string().optional(), // Will be generated
+  reviewedAt: z.string().optional()
 }).refine(
   (data) => {
     if (data.budgetLow && data.budgetHigh) {
@@ -46,10 +45,12 @@ export const CreateInquirySchema = InquirySchema.pick({
   services: true,
   description: true,
   hasExistingSystem: true,
+  sheetUrl: true,
   filePath: true,
   budgetLow: true,
   budgetHigh: true,
-  desiredDate: true
+  desiredDate: true,
+  templateId: true
 });
 
 /**
@@ -62,8 +63,7 @@ export const UpdateInquirySchema = InquirySchema.partial().omit({
 
 /**
  * @typedef {Object} Inquiry
- * @property {string} id - UUID
- * @property {string} createdAt - ISO date string
+ * @property {string} id - "inquiry-<timestamp>-<rand>"
  * @property {string} name - User's name
  * @property {string} email - User's email
  * @property {string} [company] - Company/organization (optional)
@@ -71,14 +71,15 @@ export const UpdateInquirySchema = InquirySchema.partial().omit({
  * @property {string[]} [services] - Array of service names (optional)
  * @property {string} description - Project description
  * @property {boolean} [hasExistingSystem] - Whether user has existing file/system (optional)
+ * @property {string} [sheetUrl] - URL to existing sheet (optional)
  * @property {string} [filePath] - Path to uploaded file (optional)
  * @property {number} [budgetLow] - Budget low end in USD (optional)
  * @property {number} [budgetHigh] - Budget high end in USD (optional)
  * @property {string} [desiredDate] - Desired completion date (optional)
- * @property {'new' | 'checked' | 'dropped'} status - Inquiry status
- * @property {string} [checkedAt] - When marked as checked (optional)
- * @property {string} [droppedAt] - When marked as dropped (optional)
- * @property {Object} [meta] - Additional metadata (optional)
+ * @property {string} [templateId] - Associated template ID (optional)
+ * @property {'new' | 'accepted' | 'declined'} status - Inquiry status
+ * @property {string} createdAt - ISO date string
+ * @property {string} [reviewedAt] - When status was changed (optional)
  */
 
 /**
@@ -90,10 +91,12 @@ export const UpdateInquirySchema = InquirySchema.partial().omit({
  * @property {string[]} [services] - Array of service names (optional)
  * @property {string} description - Project description
  * @property {boolean} [hasExistingSystem] - Whether user has existing file/system (optional)
+ * @property {string} [sheetUrl] - URL to existing sheet (optional)
  * @property {string} [filePath] - Path to uploaded file (optional)
  * @property {number} [budgetLow] - Budget low end in USD (optional)
  * @property {number} [budgetHigh] - Budget high end in USD (optional)
  * @property {string} [desiredDate] - Desired completion date (optional)
+ * @property {string} [templateId] - Associated template ID (optional)
  */
 
 /**
@@ -105,14 +108,14 @@ export const UpdateInquirySchema = InquirySchema.partial().omit({
  * @property {string[]} [services] - Array of service names (optional)
  * @property {string} [description] - Project description (optional)
  * @property {boolean} [hasExistingSystem] - Whether user has existing file/system (optional)
+ * @property {string} [sheetUrl] - URL to existing sheet (optional)
  * @property {string} [filePath] - Path to uploaded file (optional)
  * @property {number} [budgetLow] - Budget low end in USD (optional)
  * @property {number} [budgetHigh] - Budget high end in USD (optional)
  * @property {string} [desiredDate] - Desired completion date (optional)
- * @property {'new' | 'checked' | 'dropped'} [status] - Inquiry status (optional)
- * @property {string} [checkedAt] - When marked as checked (optional)
- * @property {string} [droppedAt] - When marked as dropped (optional)
- * @property {Object} [meta] - Additional metadata (optional)
+ * @property {string} [templateId] - Associated template ID (optional)
+ * @property {'new' | 'accepted' | 'declined'} [status] - Inquiry status (optional)
+ * @property {string} [reviewedAt] - When status was changed (optional)
  */
 
 export {}; 

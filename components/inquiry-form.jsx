@@ -31,6 +31,7 @@ export function InquiryForm({ templateId }) {
     services: [],
     description: '',
     hasExistingSystem: false,
+    sheetUrl: '',
     budgetLow: '',
     budgetHigh: '',
     desiredDate: '',
@@ -298,6 +299,20 @@ export function InquiryForm({ templateId }) {
                   </p>
                 </div>
               )}
+              
+              <div>
+                <Label htmlFor="sheetUrl">Existing Sheet URL (optional)</Label>
+                <Input
+                  id="sheetUrl"
+                  type="url"
+                  value={formData.sheetUrl}
+                  onChange={(e) => setFormData(prev => ({ ...prev, sheetUrl: e.target.value }))}
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  If you have an existing spreadsheet or document, paste the URL here
+                </p>
+              </div>
             </div>
           </div>
 

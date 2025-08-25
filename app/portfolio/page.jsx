@@ -1,12 +1,12 @@
 export const dynamic = 'force-dynamic';
 
-import { getActiveProjects } from '@/lib/portfolio.js';
+import { getAllProjects } from '@/lib/portfolio.js';
 import PortfolioCard from '@/components/PortfolioCard.jsx';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export default async function PortfolioPage() {
-  const projects = await getActiveProjects();
+  const projects = await getAllProjects();
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">

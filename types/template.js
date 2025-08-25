@@ -16,7 +16,7 @@ export const TemplateSchema = z.object({
   previewUrl: z.string().optional(),
   purchaseUrl: z.string().optional(),
   buyUrl: z.string().optional(),
-  active: z.boolean().default(false),
+  active: z.boolean().default(true),
   updatedAt: z.string().datetime().optional(),
   createdAt: z.string().datetime().optional()
 });
@@ -66,7 +66,11 @@ export const CreateTemplateSchema = TemplateSchema.pick({
       return num;
     }),
     z.number().positive('Price must be a positive number')
-  ])
+  ]),
+  active: z.union([
+    z.string().transform(val => val === 'true' || val === '1'),
+    z.boolean()
+  ]).default(true)
 });
 
 /**

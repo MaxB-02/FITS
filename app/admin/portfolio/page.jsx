@@ -1,11 +1,11 @@
+export const dynamic = 'force-dynamic';
+
 import { getAllProjects } from '@/lib/portfolio.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2, Eye, Plus } from 'lucide-react';
 import Link from 'next/link';
-
-export const dynamic = 'force-dynamic';
 
 export default async function AdminPortfolioPage() {
   // Fetch projects directly on the server with bulletproof error handling

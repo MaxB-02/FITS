@@ -46,13 +46,12 @@ export default function AdminInquiriesPage() {
       setUpdating(prev => ({ ...prev, [inquiryId]: true }));
       
       const response = await fetch(`/api/admin/inquiries/${inquiryId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
-          status: newStatus,
-          reviewedAt: new Date().toISOString()
+          status: newStatus
         })
       });
       
@@ -72,13 +71,14 @@ export default function AdminInquiriesPage() {
           });
         }
       } else {
-        throw new Error('Failed to update inquiry');
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Failed to ${newStatus} inquiry`);
       }
     } catch (error) {
       console.error(`Error updating inquiry status:`, error);
       toast({
         title: "Error",
-        description: `Failed to ${newStatus} inquiry. Please try again.`,
+        description: error.message || `Failed to ${newStatus} inquiry. Please try again.`,
         variant: "destructive"
       });
     } finally {

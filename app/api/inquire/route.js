@@ -3,6 +3,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { readJSON, writeJSON } from '@/lib/file-db.js';
 import { revalidatePath } from 'next/cache';
+import { CreateInquirySchema } from '@/types/inquiry.js';
 
 export const runtime = 'nodejs';
 
@@ -62,6 +63,7 @@ export async function POST(request) {
         services: services,
         description: formData.get('description'),
         hasExistingSystem: formData.get('hasExistingSystem') === 'on',
+        sheetUrl: formData.get('sheetUrl'),
         filePath: filePath,
         budgetLow: formData.get('budgetLow') ? parseFloat(formData.get('budgetLow')) : undefined,
         budgetHigh: formData.get('budgetHigh') ? parseFloat(formData.get('budgetHigh')) : undefined,
@@ -89,34 +91,15 @@ export async function POST(request) {
       }
     }
 
-    // Basic validation
-    if (!inquiryData.name || !inquiryData.email || !inquiryData.description) {
+    // Validate the inquiry data
+    const validationResult = CreateInquirySchema.safeParse(inquiryData);
+    if (!validationResult.success) {
+      console.error('Validation failed:', validationResult.error);
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: name, email, description' }),
-        { 
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(inquiryData.email)) {
-      return new Response(
-        JSON.stringify({ error: 'Invalid email address' }),
-        { 
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
-      );
-    }
-
-    // Budget validation
-    if (inquiryData.budgetLow && inquiryData.budgetHigh && 
-        parseFloat(inquiryData.budgetLow) > parseFloat(inquiryData.budgetHigh)) {
-      return new Response(
-        JSON.stringify({ error: 'Budget high must be greater than or equal to budget low' }),
+        JSON.stringify({ 
+          error: 'Validation failed',
+          issues: validationResult.error.issues 
+        }),
         { 
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -125,7 +108,7 @@ export async function POST(request) {
     }
 
     // Generate unique ID and timestamp
-    const id = `inquiry-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const id = `inquiry-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
     const createdAt = new Date().toISOString();
 
     // Create inquiry object
@@ -249,18 +232,31 @@ export async function POST(request) {
       }
     }
 
-    // Return success response
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: 'Inquiry submitted successfully',
-        inquiryId: inquiry.id
-      }),
-      { 
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      }
-    );
+    // Check if this is a fetch/AJAX request
+    const acceptHeader = request.headers.get('accept') || '';
+    const isAjaxRequest = acceptHeader.includes('application/json') || 
+                         request.headers.get('x-requested-with') === 'XMLHttpRequest';
+
+    if (isAjaxRequest) {
+      // Return JSON response for AJAX requests
+      return new Response(
+        JSON.stringify({ 
+          ok: true,
+          id: inquiry.id,
+          message: 'Inquiry submitted successfully'
+        }),
+        { 
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    } else {
+      // Redirect to thank you page for form submissions
+      return new Response(null, {
+        status: 303,
+        headers: { 'Location': '/thank-you' }
+      });
+    }
 
   } catch (error) {
     console.error('Error processing inquiry:', error);

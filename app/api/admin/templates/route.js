@@ -1,89 +1,116 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdminNode } from '@/lib/auth-simple.js';
 import { getAllTemplates, createTemplate } from '@/lib/templates.js';
-import { revalidatePath } from 'next/cache';
 import { CreateTemplateSchema } from '@/types/template.js';
+import { revalidatePath } from 'next/cache';
 
 export const runtime = 'nodejs';
 
 export async function GET(request) {
   try {
-    await requireAdminNode(request); // Authenticate
+    console.log('Fetching all templates');
+    
     const templates = await getAllTemplates();
-    return NextResponse.json(templates);
+    
+    console.log(`Successfully fetched ${templates.length} templates`);
+    
+    return new Response(
+      JSON.stringify(templates),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+    
   } catch (error) {
     console.error('Error fetching templates:', error);
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 });
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to fetch templates',
+        details: error.message 
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   }
 }
 
 export async function POST(request) {
   try {
-    await requireAdminNode(request); // Authenticate
-    
     const body = await request.json();
-    console.log('POST /api/admin/templates - Received body:', body);
     
-    // Validate with zod schema
+    console.log('Creating new template with data:', body);
+    
+    // Validate the template data
     const validationResult = CreateTemplateSchema.safeParse(body);
     if (!validationResult.success) {
-      console.log('POST /api/admin/templates - Validation failed:', validationResult.error.errors);
-      const errors = validationResult.error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ');
-      return NextResponse.json(
-        { error: `Validation failed: ${errors}` },
-        { status: 400 }
+      console.error('Validation failed:', validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Validation failed',
+          issues: validationResult.error.issues 
+        }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
-    
-    const validatedData = validationResult.data;
-    console.log('POST /api/admin/templates - Validated data:', validatedData);
     
     // Check for duplicate ID
     const existingTemplates = await getAllTemplates();
-    console.log('POST /api/admin/templates - Existing templates count:', existingTemplates.length);
-    
-    if (existingTemplates.find(t => t.id === validatedData.id)) {
-      console.log('POST /api/admin/templates - Duplicate ID found:', validatedData.id);
-      return NextResponse.json(
-        { error: 'Template with this ID already exists' },
-        { status: 409 }
+    const duplicateId = existingTemplates.find(t => t.id === body.id);
+    if (duplicateId) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Template ID already exists',
+          message: `A template with ID "${body.id}" already exists. Please choose a different ID.`
+        }),
+        { 
+          status: 409,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
     }
     
-    // Set default active to false if not provided and add timestamps
-    const templateData = {
-      ...validatedData,
-      active: validatedData.active !== undefined ? validatedData.active : false,
-      updatedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString()
-    };
+    // Create the template
+    const newTemplate = await createTemplate({
+      ...body,
+      active: body.active !== undefined ? body.active : true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
     
-    console.log('POST /api/admin/templates - Creating template with data:', templateData);
+    console.log('Template created successfully:', newTemplate);
     
-    const newTemplate = await createTemplate(templateData);
-    console.log('POST /api/admin/templates - Template created successfully:', newTemplate);
-    
-    // Revalidate paths to ensure public pages update
-    revalidatePath('/templates');
+    // Revalidate all relevant paths
+    revalidatePath('/admin');
     revalidatePath('/admin/templates');
-    revalidatePath(`/templates/${newTemplate.id}`);
+    revalidatePath('/templates');
     
-    return NextResponse.json({ 
-      ok: true, 
-      id: newTemplate.id,
-      template: newTemplate 
-    }, { status: 201 });
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        template: newTemplate 
+      }),
+      { 
+        status: 201,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+    
   } catch (error) {
-    console.error('POST /api/admin/templates - Error:', error);
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    return NextResponse.json({ 
-      error: 'Failed to create template',
-      details: error.message 
-    }, { status: 500 });
+    console.error('Error creating template:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Failed to create template',
+        details: error.message 
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   }
 } 

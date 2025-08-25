@@ -32,25 +32,4 @@ export async function GET(request) {
       }
     );
   }
-}
-
-export async function POST(request) {
-  try {
-    const user = await requireAdminNode(request);
-    
-    const data = await request.json();
-    const inquiry = await createInquiry(data);
-    
-    return NextResponse.json(inquiry, { status: 201 });
-    
-  } catch (error) {
-    console.error('Error creating inquiry:', error);
-    if (error.message === 'Unauthorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    return NextResponse.json(
-      { error: 'Failed to create inquiry' },
-      { status: 500 }
-    );
-  }
 } 
