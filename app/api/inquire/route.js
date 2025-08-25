@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { readJSON, writeJSON } from '@/lib/file-db.js';
-import { revalidatePath } from 'next/cache';
-import { CreateInquirySchema } from '@/types/inquiry.js';
 
 export const runtime = 'nodejs';
 
@@ -63,7 +61,6 @@ export async function POST(request) {
         services: services,
         description: formData.get('description'),
         hasExistingSystem: formData.get('hasExistingSystem') === 'on',
-        sheetUrl: formData.get('sheetUrl'),
         filePath: filePath,
         budgetLow: formData.get('budgetLow') ? parseFloat(formData.get('budgetLow')) : undefined,
         budgetHigh: formData.get('budgetHigh') ? parseFloat(formData.get('budgetHigh')) : undefined,
@@ -91,15 +88,34 @@ export async function POST(request) {
       }
     }
 
-    // Validate the inquiry data
-    const validationResult = CreateInquirySchema.safeParse(inquiryData);
-    if (!validationResult.success) {
-      console.error('Validation failed:', validationResult.error);
+    // Basic validation
+    if (!inquiryData.name || !inquiryData.email || !inquiryData.description) {
       return new Response(
-        JSON.stringify({ 
-          error: 'Validation failed',
-          issues: validationResult.error.issues 
-        }),
+        JSON.stringify({ error: 'Missing required fields: name, email, description' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(inquiryData.email)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid email address' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Budget validation
+    if (inquiryData.budgetLow && inquiryData.budgetHigh && 
+        parseFloat(inquiryData.budgetLow) > parseFloat(inquiryData.budgetHigh)) {
+      return new Response(
+        JSON.stringify({ error: 'Budget high must be greater than or equal to budget low' }),
         { 
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -140,10 +156,6 @@ export async function POST(request) {
       console.log('Successfully saved inquiry to local database');
       console.log('New leads count:', leads.length);
       
-      // Revalidate admin paths to ensure new inquiries appear immediately
-      revalidatePath('/admin');
-      revalidatePath('/admin/inquiries');
-      
     } catch (error) {
       console.error('Error saving inquiry:', error);
       console.error('Error details:', {
@@ -168,10 +180,6 @@ export async function POST(request) {
         await writeJSON(fallbackPath, fallbackLeads);
         
         console.log('✅ Successfully saved inquiry to fallback location:', fallbackPath);
-        
-        // Revalidate admin paths
-        revalidatePath('/admin');
-        revalidatePath('/admin/inquiries');
         
       } catch (fallbackError) {
         console.error('❌ Fallback also failed:', fallbackError);
