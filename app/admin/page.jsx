@@ -2,7 +2,9 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Users, CheckCircle, XCircle, ArrowRight, Package } from 'lucide-react';
-import { getAllInquiries, getAllTemplates, getAllProjects } from '@/lib/inquiries.js';
+import { getAllInquiries } from '@/lib/inquiries.js';
+import { getAllTemplates } from '@/lib/templates.js';
+import { getAllProjects } from '@/lib/portfolio.js';
 import { initializeProductionData } from '@/lib/init-production-data.js';
 export const dynamic = 'force-dynamic';
 
