@@ -103,25 +103,5 @@
     "desiredDate": null,
     "templateId": null,
     "status": "new"
-  },
-  {
-    "id": "inquiry-1755796274149-jxb217166",
-    "createdAt": "2025-08-21T17:11:14.149Z",
-    "name": "Test User 222",
-    "email": "test@example.com",
-    "company": "Test Company",
-    "phone": "123-456-7890",
-    "services": [
-      "Custom Dashboard"
-    ],
-    "description": "Test project description",
-    "hasExistingSystem": false,
-    "filePath": null,
-    "budgetLow": 500,
-    "budgetHigh": 2000,
-    "desiredDate": "2025-12-31",
-    "templateId": null,
-    "status": "declined",
-    "reviewedAt": "2025-08-25T17:35:28.126Z"
   }
 ]

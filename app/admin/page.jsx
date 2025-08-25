@@ -2,12 +2,18 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Users, CheckCircle, XCircle, ArrowRight, Package } from 'lucide-react';
-import { getAllInquiries } from '@/lib/inquiries.js';
-import { getAllTemplates } from '@/lib/templates.js';
+import { getAllInquiries, getAllTemplates, getAllProjects } from '@/lib/inquiries.js';
+import { initializeProductionData } from '@/lib/init-production-data.js';
 export const dynamic = 'force-dynamic';
-import { getAllProjects } from '@/lib/portfolio.js';
 
 export default async function AdminDashboardPage() {
+  // Initialize production data if needed
+  try {
+    await initializeProductionData();
+  } catch (error) {
+    console.log('Production data initialization skipped or failed:', error.message);
+  }
+
   // Initialize with empty arrays as fallbacks
   let inquiries = [];
   let templates = [];
