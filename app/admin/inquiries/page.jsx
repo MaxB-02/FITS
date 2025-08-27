@@ -88,7 +88,7 @@ export default async function AdminInquiriesPage() {
       ) : (
         <div className="space-y-4">
           {inquiries.map((inquiry) => (
-            <Card key={inquiry.id}>
+            <Card key={inquiry.id} data-inquiry-id={inquiry.id}>
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -97,11 +97,14 @@ export default async function AdminInquiriesPage() {
                     {inquiry.company && <p className="text-sm text-gray-600">{inquiry.company}</p>}
                   </div>
                   <div className="text-right">
-                    <Badge variant={
-                      inquiry.status === 'new' ? 'default' : 
-                      inquiry.status === 'accepted' ? 'secondary' : 
-                      'destructive'
-                    }>
+                    <Badge 
+                      variant={
+                        inquiry.status === 'new' ? 'default' : 
+                        inquiry.status === 'accepted' ? 'secondary' : 
+                        'destructive'
+                      }
+                      className="status-badge"
+                    >
                       {inquiry.status || 'unknown'}
                     </Badge>
                     <p className="text-xs text-gray-500 mt-1">

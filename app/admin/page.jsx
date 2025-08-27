@@ -126,7 +126,7 @@ export default async function AdminDashboardPage() {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold" data-stat="total">
               {stats.total}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -141,7 +141,7 @@ export default async function AdminDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-600" data-stat="new">
               {stats.new}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -156,7 +156,7 @@ export default async function AdminDashboardPage() {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-600" data-stat="accepted">
               {stats.accepted}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -171,7 +171,7 @@ export default async function AdminDashboardPage() {
             <XCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">
+            <div className="text-2xl font-bold text-red-600" data-stat="declined">
               {stats.declined}
             </div>
             <p className="text-xs text-muted-foreground">

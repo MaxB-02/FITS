@@ -9,6 +9,37 @@ export default function InquiryActions({ inquiry }) {
   const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
 
+  const updateDashboardNumbers = async () => {
+    try {
+      // Fetch the latest inquiry stats
+      const response = await fetch('/api/admin/inquiries');
+      if (response.ok) {
+        const inquiries = await response.json();
+        
+        // Calculate new stats
+        const stats = {
+          total: inquiries.length,
+          new: inquiries.filter(inq => inq.status === 'new').length,
+          accepted: inquiries.filter(inq => inq.status === 'accepted').length,
+          declined: inquiries.filter(inq => inq.status === 'declined').length
+        };
+        
+        // Update dashboard numbers if they exist on the page
+        const totalElement = document.querySelector('[data-stat="total"]');
+        const newElement = document.querySelector('[data-stat="new"]');
+        const acceptedElement = document.querySelector('[data-stat="accepted"]');
+        const declinedElement = document.querySelector('[data-stat="declined"]');
+        
+        if (totalElement) totalElement.textContent = stats.total;
+        if (newElement) newElement.textContent = stats.new;
+        if (acceptedElement) acceptedElement.textContent = stats.accepted;
+        if (declinedElement) declinedElement.textContent = stats.declined;
+      }
+    } catch (error) {
+      console.error('Failed to update dashboard numbers:', error);
+    }
+  };
+
   const handleStatusUpdate = async (inquiryId, newStatus) => {
     try {
       setUpdating(true);
@@ -32,8 +63,18 @@ export default function InquiryActions({ inquiry }) {
             description: `Inquiry ${newStatus} successfully.`,
           });
           
-          // Force a page refresh to show updated data
-          window.location.reload();
+          // Update the inquiry status in the current page
+          const statusBadge = document.querySelector(`[data-inquiry-id="${inquiryId}"] .status-badge`);
+          if (statusBadge) {
+            statusBadge.textContent = newStatus;
+            // Update badge variant
+            statusBadge.className = `status-badge ${newStatus === 'accepted' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
+          }
+          
+          // Update dashboard numbers
+          setTimeout(() => {
+            updateDashboardNumbers();
+          }, 500);
         }
       } else {
         const errorData = await response.json();
@@ -72,8 +113,16 @@ export default function InquiryActions({ inquiry }) {
             description: "Inquiry deleted successfully.",
           });
           
-          // Force a page refresh to show updated data
-          window.location.reload();
+          // Remove the inquiry card from the current page
+          const inquiryCard = document.querySelector(`[data-inquiry-id="${inquiryId}"]`);
+          if (inquiryCard) {
+            inquiryCard.remove();
+          }
+          
+          // Update dashboard numbers
+          setTimeout(() => {
+            updateDashboardNumbers();
+          }, 500);
         }
       } else {
         throw new Error('Failed to delete inquiry');
