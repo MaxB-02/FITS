@@ -64,11 +64,6 @@ export async function PUT(request, { params }) {
       );
     }
     
-    // Revalidate admin pages
-    const { revalidatePath } = await import('next/cache');
-    revalidatePath('/admin');
-    revalidatePath('/admin/inquiries');
-    
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -112,11 +107,6 @@ export async function DELETE(request, { params }) {
         }
       );
     }
-    
-    // Revalidate admin pages
-    const { revalidatePath } = await import('next/cache');
-    revalidatePath('/admin');
-    revalidatePath('/admin/inquiries');
     
     return new Response(
       JSON.stringify({ 
