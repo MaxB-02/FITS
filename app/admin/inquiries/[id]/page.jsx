@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, CheckCircle, XCircle, Trash2, Calendar, DollarSign, Globe, Building, FileText } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function InquiryDetailPage({ params }) {
   const inquiry = await getInquiryById(params.id);
   
