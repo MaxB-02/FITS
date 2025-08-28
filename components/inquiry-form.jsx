@@ -119,37 +119,61 @@ export function InquiryForm({ templateId }) {
         submitData.append('file', fileInput.files[0]);
       }
 
+      console.log('Submitting form data:', {
+        name: formData.name,
+        email: formData.email,
+        services: formData.services,
+        description: formData.description
+      });
+
       const response = await fetch('/api/inquire', {
         method: 'POST',
         body: submitData, // Don't set Content-Type header for FormData
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.entries()));
+
       if (response.ok) {
-        const result = await response.json();
-        
-        if (result.success) {
-          try {
-            toast({
-              title: "Success!",
-              description: "Your inquiry has been submitted successfully. Redirecting...",
-            });
-          } catch (toastError) {
-            console.error('Toast error:', toastError);
-            alert("Success! Your inquiry has been submitted successfully. Redirecting...");
-          }
+        try {
+          const result = await response.json();
+          console.log('Response data:', result);
           
-          // Wait a moment for the toast to show, then redirect
-          setTimeout(() => {
+          if (result.success) {
             try {
-              router.push('/thank-you');
-            } catch (routerError) {
-              console.error('Router error:', routerError);
-              // Fallback: use window.location
-              window.location.href = '/thank-you';
+              toast({
+                title: "Success!",
+                description: "Your inquiry has been submitted successfully. Redirecting...",
+              });
+            } catch (toastError) {
+              console.error('Toast error:', toastError);
+              alert("Success! Your inquiry has been submitted successfully. Redirecting...");
             }
-          }, 1500);
-        } else {
-          throw new Error(result.error || 'Failed to submit inquiry');
+            
+            // Wait a moment for the toast to show, then redirect
+            setTimeout(() => {
+              try {
+                router.push('/thank-you');
+              } catch (routerError) {
+                console.error('Router error:', routerError);
+                // Fallback: use window.location
+                window.location.href = '/thank-you';
+              }
+            }, 1500);
+          } else {
+            throw new Error(result.error || 'Failed to submit inquiry');
+          }
+        } catch (parseError) {
+          console.error('Error parsing response:', parseError);
+          // If we can't parse JSON, check if it's a redirect
+          if (response.status === 303) {
+            const location = response.headers.get('Location');
+            if (location) {
+              window.location.href = location;
+              return;
+            }
+          }
+          throw new Error('Invalid response from server');
         }
       } else {
         let errorMessage = 'Failed to submit inquiry';
@@ -158,6 +182,11 @@ export function InquiryForm({ templateId }) {
           errorMessage = result.error || errorMessage;
         } catch (parseError) {
           console.log('⚠️ Could not parse error response:', parseError);
+          // Check if it's an HTML error response
+          const textResponse = await response.text();
+          if (textResponse.includes('DOCTYPE')) {
+            errorMessage = 'Server returned HTML instead of JSON. This usually means there was a server error.';
+          }
         }
         throw new Error(errorMessage);
       }

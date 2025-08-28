@@ -1,7 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { readJSON, writeJSON } from '@/lib/file-db.js';
+
+// Import file-db functions directly to avoid path issues
+async function readJSON(filePath) {
+  try {
+    const data = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading JSON file:', filePath, error.message);
+    return [];
+  }
+}
+
+async function writeJSON(filePath, data) {
+  try {
+    // Ensure directory exists
+    const dir = path.dirname(filePath);
+    await fs.mkdir(dir, { recursive: true });
+    
+    // Write to temporary file first
+    const tempPath = filePath + '.tmp';
+    await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf8');
+    
+    // Then rename to final file (atomic operation)
+    await fs.rename(tempPath, filePath);
+    
+    console.log('✅ File written successfully:', filePath);
+  } catch (error) {
+    console.error('Error writing JSON file:', filePath, error.message);
+    throw error;
+  }
+}
 
 export const runtime = 'nodejs';
 
@@ -249,7 +279,7 @@ export async function POST(request) {
       // Return JSON response for AJAX requests
       return new Response(
         JSON.stringify({ 
-          ok: true,
+          success: true,
           id: inquiry.id,
           message: 'Inquiry submitted successfully'
         }),
