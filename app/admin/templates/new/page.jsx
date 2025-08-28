@@ -69,7 +69,8 @@ export default function NewTemplatePage() {
       });
 
       console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      // Note: response.headers.entries() is not available in all environments
+      // console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
         const result = await response.json();
