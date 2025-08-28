@@ -1,61 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-
-// Import file-db functions directly to avoid path issues
-async function readJSON(filePath) {
-  try {
-    const data = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('Error reading JSON file:', filePath, error.message);
-    return [];
-  }
-}
-
-async function writeJSON(filePath, data) {
-  try {
-    // Ensure directory exists
-    const dir = path.dirname(filePath);
-    await fs.mkdir(dir, { recursive: true });
-    
-    // Write to temporary file first
-    const tempPath = filePath + '.tmp';
-    await fs.writeFile(tempPath, JSON.stringify(data, null, 2), 'utf8');
-    
-    // Then rename to final file (atomic operation)
-    await fs.rename(tempPath, filePath);
-    
-    console.log('✅ File written successfully:', filePath);
-  } catch (error) {
-    console.error('Error writing JSON file:', filePath, error.message);
-    throw error;
-  }
-}
+import inquiriesService from '../../../lib/services/inquiries.js';
 
 export const runtime = 'nodejs';
 
 export async function POST(request) {
   try {
+    console.log('🚀 Processing new inquiry submission...');
+    
     let inquiryData;
     let filePath = null;
-    const dataDir = process.env.DATA_DIR || 'data';
-    const uploadsDirRoot = process.env.UPLOADS_DIR || 'uploads';
-
+    
     // Check if this is multipart/form-data (file upload)
     const contentType = request.headers.get('content-type') || '';
     
     if (contentType.includes('multipart/form-data')) {
+      console.log('📁 Processing multipart form data with file upload');
+      
       // Handle file upload
       const formData = await request.formData();
       
       // Extract file if present
       const file = formData.get('file');
       if (file && file instanceof File) {
-        // Create uploads directory if it doesn't exist
-        const uploadsDir = path.isAbsolute(uploadsDirRoot)
-          ? uploadsDirRoot
-          : path.join(process.cwd(), uploadsDirRoot);
+        console.log('📎 Processing file upload:', file.name);
+        
+        // Create uploads directory
+        const uploadsDir = path.join(process.cwd(), 'uploads');
         await fs.mkdir(uploadsDir, { recursive: true });
         
         // Generate unique filename
@@ -70,9 +42,9 @@ export async function POST(request) {
         await fs.writeFile(uploadPath, buffer);
         
         // Store relative path for database
-        filePath = `${uploadsDirRoot.replace(/\/$/, '')}/${fileName}`;
+        filePath = `uploads/${fileName}`;
         
-        console.log(`File uploaded successfully: ${uploadPath}`);
+        console.log(`✅ File uploaded successfully: ${uploadPath}`);
       }
       
       // Extract other form data
@@ -97,7 +69,17 @@ export async function POST(request) {
         desiredDate: formData.get('desiredDate'),
         templateId: formData.get('templateId') || null
       };
+      
+      console.log('📝 Extracted form data:', {
+        name: inquiryData.name,
+        email: inquiryData.email,
+        services: inquiryData.services,
+        hasFile: !!filePath
+      });
+      
     } else {
+      console.log('📝 Processing JSON form data');
+      
       // Handle JSON data
       try {
         inquiryData = await request.json();
@@ -107,7 +89,7 @@ export async function POST(request) {
           inquiryData.templateId = null;
         }
       } catch (parseError) {
-        console.error('Error parsing JSON request:', parseError);
+        console.error('❌ Error parsing JSON request:', parseError);
         return new Response(
           JSON.stringify({ error: 'Invalid JSON data' }),
           { 
@@ -120,6 +102,7 @@ export async function POST(request) {
 
     // Basic validation
     if (!inquiryData.name || !inquiryData.email || !inquiryData.description) {
+      console.log('❌ Missing required fields');
       return new Response(
         JSON.stringify({ error: 'Missing required fields: name, email, description' }),
         { 
@@ -132,6 +115,7 @@ export async function POST(request) {
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(inquiryData.email)) {
+      console.log('❌ Invalid email format');
       return new Response(
         JSON.stringify({ error: 'Invalid email address' }),
         { 
@@ -144,6 +128,7 @@ export async function POST(request) {
     // Budget validation
     if (inquiryData.budgetLow && inquiryData.budgetHigh && 
         parseFloat(inquiryData.budgetLow) > parseFloat(inquiryData.budgetHigh)) {
+      console.log('❌ Invalid budget range');
       return new Response(
         JSON.stringify({ error: 'Budget high must be greater than or equal to budget low' }),
         { 
@@ -153,91 +138,12 @@ export async function POST(request) {
       );
     }
 
-    // Generate unique ID and timestamp
-    const id = `inquiry-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    const createdAt = new Date().toISOString();
+    console.log('✅ Validation passed, creating inquiry...');
 
-    // Create inquiry object
-    const inquiry = {
-      id,
-      createdAt,
-      ...inquiryData,
-      status: 'new'
-    };
-
-    // Save to leads.json
-    try {
-      console.log('Attempting to save inquiry to leads.json');
-      console.log('Current working directory:', process.cwd());
-      console.log('Environment variables:');
-      console.log('- DATA_DIR:', process.env.DATA_DIR);
-      console.log('- NODE_ENV:', process.env.NODE_ENV);
-      
-      const leadsPath = path.isAbsolute(dataDir)
-        ? path.join(dataDir, 'leads.json')
-        : path.join(process.cwd(), dataDir, 'leads.json');
-      const leads = await readJSON(leadsPath);
-      console.log('Current leads count:', leads.length);
-      console.log('Adding new inquiry:', inquiry);
-      
-      leads.push(inquiry);
-      await writeJSON(leadsPath, leads);
-      
-      console.log('Successfully saved inquiry to local database');
-      console.log('New leads count:', leads.length);
-      
-    } catch (error) {
-      console.error('Error saving inquiry:', error);
-      console.error('Error details:', {
-        code: error.code,
-        message: error.message,
-        stack: error.stack
-      });
-      
-      // Try fallback: save to /tmp if primary location fails
-      try {
-        console.log('🔄 Trying fallback: saving to /tmp directory');
-        const fallbackPath = '/tmp/leads.json';
-        let fallbackLeads = [];
-        
-        try {
-          fallbackLeads = await readJSON(fallbackPath);
-        } catch (readError) {
-          console.log('📝 Creating new fallback leads file');
-        }
-        
-        fallbackLeads.push(inquiry);
-        await writeJSON(fallbackPath, fallbackLeads);
-        
-        console.log('✅ Successfully saved inquiry to fallback location:', fallbackPath);
-        
-      } catch (fallbackError) {
-        console.error('❌ Fallback also failed:', fallbackError);
-        
-        // Provide more specific error messages
-        let errorMessage = 'Failed to save inquiry to database';
-        if (error.code === 'EACCES') {
-          errorMessage = 'Permission denied: Cannot write to database directory';
-        } else if (error.code === 'ENOSPC') {
-          errorMessage = 'No space left on device';
-        } else if (error.code === 'EROFS') {
-          errorMessage = 'Read-only file system: Cannot write to database';
-        }
-        
-        return new Response(
-          JSON.stringify({ 
-            error: errorMessage,
-            details: error.message,
-            code: error.code,
-            fallbackError: fallbackError.message
-          }),
-          { 
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
-      }
-    }
+    // Create inquiry using the new service
+    const inquiry = await inquiriesService.create(inquiryData);
+    
+    console.log('✅ Inquiry created successfully:', inquiry.id);
 
     // Send email notification (if configured)
     if (process.env.RESEND_API_KEY) {
@@ -264,9 +170,9 @@ export async function POST(request) {
           `
         });
         
-        console.log('Email notification sent successfully');
+        console.log('✅ Email notification sent successfully');
       } catch (error) {
-        console.error('Error sending email notification:', error);
+        console.error('❌ Error sending email notification:', error);
       }
     }
 
@@ -276,6 +182,7 @@ export async function POST(request) {
                          request.headers.get('x-requested-with') === 'XMLHttpRequest';
 
     if (isAjaxRequest) {
+      console.log('📱 Returning JSON response for AJAX request');
       // Return JSON response for AJAX requests
       return new Response(
         JSON.stringify({ 
@@ -289,6 +196,7 @@ export async function POST(request) {
         }
       );
     } else {
+      console.log('🌐 Redirecting to thank you page for form submission');
       // Redirect to thank you page for form submissions
       return new Response(null, {
         status: 303,
@@ -297,7 +205,7 @@ export async function POST(request) {
     }
 
   } catch (error) {
-    console.error('Error processing inquiry:', error);
+    console.error('💥 Error processing inquiry:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Failed to process inquiry',

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getInquiryById, updateInquiry, deleteInquiry } from '@/lib/inquiries.js';
+import inquiriesService from '../../../../../lib/services/inquiries.js';
 
 export const runtime = 'nodejs';
 
 export async function GET(request, { params }) {
   try {
-    const inquiry = await getInquiryById(params.id);
+    console.log(`📊 Fetching inquiry: ${params.id}`);
+    
+    const inquiry = await inquiriesService.getById(params.id);
     
     if (!inquiry) {
       return new Response(
@@ -26,7 +28,7 @@ export async function GET(request, { params }) {
     );
     
   } catch (error) {
-    console.error('Error fetching inquiry:', error);
+    console.error('❌ Error fetching inquiry:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Failed to fetch inquiry',
@@ -45,14 +47,9 @@ export async function PUT(request, { params }) {
     const { id } = params;
     const updates = await request.json();
     
-    console.log(`Updating inquiry ${id} with:`, updates);
+    console.log(`🔄 Updating inquiry ${id} with:`, updates);
     
-    // Set reviewedAt timestamp for status changes
-    if (updates.status && ['accepted', 'declined'].includes(updates.status)) {
-      updates.reviewedAt = new Date().toISOString();
-    }
-    
-    const updatedInquiry = await updateInquiry(id, updates);
+    const updatedInquiry = await inquiriesService.update(id, updates);
     
     if (!updatedInquiry) {
       return new Response(
@@ -76,7 +73,7 @@ export async function PUT(request, { params }) {
     );
     
   } catch (error) {
-    console.error('Error updating inquiry:', error);
+    console.error('❌ Error updating inquiry:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Failed to update inquiry',
@@ -94,9 +91,9 @@ export async function DELETE(request, { params }) {
   try {
     const { id } = params;
     
-    console.log(`Deleting inquiry ${id}`);
+    console.log(`🗑️ Deleting inquiry ${id}`);
     
-    const success = await deleteInquiry(id);
+    const success = await inquiriesService.delete(id);
     
     if (!success) {
       return new Response(
@@ -120,7 +117,7 @@ export async function DELETE(request, { params }) {
     );
     
   } catch (error) {
-    console.error('Error deleting inquiry:', error);
+    console.error('❌ Error deleting inquiry:', error);
     return new Response(
       JSON.stringify({ 
         error: 'Failed to delete inquiry',
