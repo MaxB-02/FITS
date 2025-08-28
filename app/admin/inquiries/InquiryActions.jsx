@@ -9,6 +9,20 @@ export default function InquiryActions({ inquiry }) {
   const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
 
+  const ensureDataPersistence = async () => {
+    try {
+      // Call the data persistence function
+      const response = await fetch('/api/admin/persist-data', {
+        method: 'POST'
+      });
+      if (response.ok) {
+        console.log('✅ Data persistence ensured');
+      }
+    } catch (error) {
+      console.error('⚠️ Data persistence check failed:', error);
+    }
+  };
+
   const updateDashboardNumbers = async () => {
     try {
       // Fetch the latest inquiry stats
@@ -71,9 +85,10 @@ export default function InquiryActions({ inquiry }) {
             statusBadge.className = `status-badge ${newStatus === 'accepted' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
           }
           
-          // Update dashboard numbers
-          setTimeout(() => {
-            updateDashboardNumbers();
+          // Ensure data persistence and update dashboard numbers
+          setTimeout(async () => {
+            await ensureDataPersistence();
+            await updateDashboardNumbers();
           }, 500);
         }
       } else {
@@ -119,9 +134,10 @@ export default function InquiryActions({ inquiry }) {
             inquiryCard.remove();
           }
           
-          // Update dashboard numbers
-          setTimeout(() => {
-            updateDashboardNumbers();
+          // Ensure data persistence and update dashboard numbers
+          setTimeout(async () => {
+            await ensureDataPersistence();
+            await updateDashboardNumbers();
           }, 500);
         }
       } else {
