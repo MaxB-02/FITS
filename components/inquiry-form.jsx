@@ -56,12 +56,16 @@ export function InquiryForm({ templateId }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    console.log('🚀 Form submission started');
+    
     if (isSubmitting) {
+      console.log('⚠️ Form already submitting, ignoring');
       return;
     }
     
     // Basic validation
     if (!formData.name || !formData.email || !formData.description) {
+      console.log('❌ Validation failed: missing required fields');
       try {
         toast({
           title: "Validation Error",
@@ -77,6 +81,7 @@ export function InquiryForm({ templateId }) {
 
     // Budget validation
     if (formData.budgetLow && formData.budgetHigh && parseFloat(formData.budgetLow) > parseFloat(formData.budgetHigh)) {
+      console.log('❌ Validation failed: invalid budget range');
       try {
         toast({
           title: "Validation Error",
@@ -91,27 +96,36 @@ export function InquiryForm({ templateId }) {
     }
 
     setIsSubmitting(true);
+    console.log('✅ Validation passed, starting submission...');
 
     try {
       // Create FormData for file upload
+      console.log('📦 Creating FormData...');
       const submitData = new FormData();
       
       // Add form fields
-      submitData.append('name', formData.name);
-      submitData.append('email', formData.email);
+      console.log('📝 Adding form fields to FormData...');
+      submitData.append('name', formData.name || '');
+      submitData.append('email', formData.email || '');
       submitData.append('company', formData.company || '');
       submitData.append('phone', formData.phone || '');
-      submitData.append('description', formData.description);
+      submitData.append('description', formData.description || '');
       submitData.append('hasExistingSystem', formData.hasExistingSystem ? 'on' : 'off');
       submitData.append('budgetLow', formData.budgetLow || '');
       submitData.append('budgetHigh', formData.budgetHigh || '');
       submitData.append('desiredDate', formData.desiredDate || '');
       submitData.append('templateId', formData.templateId || '');
       
-      // Add services
-      formData.services.forEach(service => {
-        submitData.append('services', service);
-      });
+      // Add services safely
+      console.log('🔧 Adding services to FormData...', formData.services);
+      if (Array.isArray(formData.services)) {
+        formData.services.forEach((service, index) => {
+          console.log(`  Adding service ${index}: ${service}`);
+          submitData.append('services', service);
+        });
+      } else {
+        console.warn('⚠️ Services is not an array:', formData.services);
+      }
 
       // Add file if exists
       const fileInput = document.getElementById('fileUpload');
@@ -168,10 +182,14 @@ export function InquiryForm({ templateId }) {
           console.error('Error parsing response:', parseError);
           // If we can't parse JSON, check if it's a redirect
           if (response.status === 303) {
-            const location = response.headers.get('Location');
-            if (location) {
-              window.location.href = location;
-              return;
+            try {
+              const location = response.headers.get('Location');
+              if (location) {
+                window.location.href = location;
+                return;
+              }
+            } catch (headerError) {
+              console.error('Error getting Location header:', headerError);
             }
           }
           throw new Error('Invalid response from server');
