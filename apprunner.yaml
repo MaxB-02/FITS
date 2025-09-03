@@ -1,4 +1,5 @@
 version: 1.0
+# App Runner configuration for FITS Python application
 runtime: python3
 build:
   commands:
