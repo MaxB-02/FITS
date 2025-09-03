@@ -8,7 +8,6 @@ from pathlib import Path
 
 # Import routes
 from .routes import admin, inquiries, templates, portfolio, auth, files, admin_inquiries
-from .middleware import auth_middleware
 
 # Create FastAPI app
 app = FastAPI(
