@@ -1,6 +1,6 @@
 version: 1.0
 # App Runner configuration for FITS Python application
-# Updated: 2025-01-09 15:30:00
+# Updated: 2025-01-09 15:30:00 - Fixed runtime version
 runtime: python3
 build:
   commands:
@@ -8,7 +8,7 @@ build:
       - echo "Installing dependencies..."
       - pip install -r requirements.txt
 run:
-  runtime-version: 3.9
+  runtime-version: 3.11
   command: python3 app.py
   network:
     port: 8000

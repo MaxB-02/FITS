@@ -20,6 +20,7 @@ def main():
     
     print(f"🚀 Starting FITS Python Application on {host}:{port}")
     print(f"📅 Deployment timestamp: 2025-01-09 15:30:00")
+    print(f"🐍 Python 3.11 Runtime - Fixed for App Runner")
     
     uvicorn.run(
         "app.main:app",
