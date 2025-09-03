@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Inquire - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 text-zinc-100">
+    <!-- Hero Section -->
+    <main class="container mx-auto px-4 py-16">
+        <div class="max-w-4xl mx-auto text-center mb-16">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                Tell me about your project.
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-zinc-300 mb-4 max-w-2xl mx-auto">
+                The more detail you give, the faster I can send you a proposal.
+            </p>
+            
+            <p class="text-lg text-zinc-400">
+                Most projects start at $500
+            </p>
+            
+            {% if template_id %}
+            <div class="mt-4 p-4 bg-emerald-900/20 border border-emerald-700 rounded-lg">
+                <p class="text-emerald-300">
+                    You're inquiring about template: <strong>{{ template_id }}</strong>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Inquiry Form -->
+        <div class="max-w-2xl mx-auto">
+            <form action="/api/inquire" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <!-- Basic Information -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Basic Information</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="name" class="block text-sm font-medium mb-2">Name *</label>
+                            <input type="text" id="name" name="name" required 
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-sm font-medium mb-2">Email *</label>
+                            <input type="email" id="email" name="email" required 
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label for="company" class="block text-sm font-medium mb-2">Company</label>
+                            <input type="text" id="company" name="company" 
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        
+                        <div>
+                            <label for="phone" class="block text-sm font-medium mb-2">Phone</label>
+                            <input type="tel" id="phone" name="phone" 
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Details -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Project Details</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium mb-2">Services Needed</label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="services" value="Custom Dashboard" class="mr-2">
+                                <span class="text-sm">Custom Dashboard</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="services" value="Workflow Automation" class="mr-2">
+                                <span class="text-sm">Workflow Automation</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="services" value="Data Processing" class="mr-2">
+                                <span class="text-sm">Data Processing</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="services" value="Report Generation" class="mr-2">
+                                <span class="text-sm">Report Generation</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="services" value="Integration Setup" class="mr-2">
+                                <span class="text-sm">Integration Setup</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" name="services" value="Other" class="mr-2">
+                                <span class="text-sm">Other</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="block text-sm font-medium mb-2">Project Description *</label>
+                        <textarea id="description" name="description" rows="4" required 
+                                  class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500"
+                                  placeholder="Describe your project in detail..."></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="has_existing_system" class="mr-2">
+                            <span class="text-sm">I have an existing system that needs integration</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Budget & Timeline -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Budget & Timeline</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="budget_low" class="block text-sm font-medium mb-2">Budget Range (Low)</label>
+                            <input type="number" id="budget_low" name="budget_low" min="0" step="100" 
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                        
+                        <div>
+                            <label for="budget_high" class="block text-sm font-medium mb-2">Budget Range (High)</label>
+                            <input type="number" id="budget_high" name="budget_high" min="0" step="100" 
+                                   class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label for="desired_date" class="block text-sm font-medium mb-2">Desired Completion Date</label>
+                        <input type="date" id="desired_date" name="desired_date" 
+                               class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Additional Files</h2>
+                    
+                    <div>
+                        <label for="file" class="block text-sm font-medium mb-2">Upload Files (Optional)</label>
+                        <input type="file" id="file" name="file" multiple 
+                               class="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:outline-none focus:border-emerald-500">
+                        <p class="text-sm text-zinc-400 mt-1">Upload any relevant documents, screenshots, or examples</p>
+                    </div>
+                </div>
+
+                <!-- Hidden template ID -->
+                {% if template_id %}
+                <input type="hidden" name="template_id" value="{{ template_id }}">
+                {% endif %}
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" 
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                        Submit Inquiry
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

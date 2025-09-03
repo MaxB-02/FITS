@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Inquiries - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Manage Inquiries</h1>
+                <p class="text-zinc-400">Review and manage project inquiries</p>
+            </div>
+            <a href="/admin" class="text-zinc-400 hover:text-white transition-colors">← Back to Dashboard</a>
+        </div>
+
+        <!-- Inquiries List -->
+        {% if inquiries %}
+        <div class="space-y-4">
+            {% for inquiry in inquiries %}
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-4 mb-2">
+                            <h3 class="text-lg font-semibold">{{ inquiry.name or 'Unnamed' }}</h3>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                {% if inquiry.status == 'new' %}bg-blue-900/50 text-blue-400
+                                {% elif inquiry.status == 'accepted' %}bg-green-900/50 text-green-400
+                                {% else %}bg-red-900/50 text-red-400{% endif %}">
+                                {{ inquiry.status or 'unknown' }}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-zinc-400 mb-3">
+                            <div><strong>Email:</strong> {{ inquiry.email or 'No email' }}</div>
+                            {% if inquiry.company %}<div><strong>Company:</strong> {{ inquiry.company }}</div>{% endif %}
+                            {% if inquiry.phone %}<div><strong>Phone:</strong> {{ inquiry.phone }}</div>{% endif %}
+                            <div><strong>Created:</strong> {{ inquiry.createdAt[:10] if inquiry.createdAt else 'N/A' }}</div>
+                        </div>
+                        
+                        {% if inquiry.description %}
+                        <p class="text-zinc-300 mb-3">{{ inquiry.description[:200] }}{% if inquiry.description|length > 200 %}...{% endif %}</p>
+                        {% endif %}
+                        
+                        {% if inquiry.services %}
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            {% for service in inquiry.services %}
+                            <span class="px-2 py-1 bg-emerald-600/20 text-emerald-400 text-xs rounded">{{ service }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="ml-4 flex flex-col gap-2">
+                        <a href="/admin/inquiries/{{ inquiry.id }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            View Details
+                        </a>
+                        <div class="flex gap-1">
+                            <button onclick="updateInquiryStatus('{{ inquiry.id }}', 'accepted')" 
+                                    class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs transition-colors">
+                                Accept
+                            </button>
+                            <button onclick="updateInquiryStatus('{{ inquiry.id }}', 'declined')" 
+                                    class="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs transition-colors">
+                                Decline
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-16">
+            <svg class="w-16 h-16 text-zinc-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <h3 class="text-xl font-semibold mb-2">No inquiries yet</h3>
+            <p class="text-zinc-400">Inquiries will appear here when submitted.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function updateInquiryStatus(inquiryId, status) {
+    if (confirm(`Are you sure you want to ${status} this inquiry?`)) {
+        fetch(`/api/admin/inquiries/${inquiryId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to update inquiry status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update inquiry status');
+        });
+    }
+}
+</script>
+{% endblock %}

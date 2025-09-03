@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}{{ template.title }} - Admin - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Template Details</h1>
+                <p class="text-zinc-400">Manage template: {{ template.title }}</p>
+            </div>
+            <a href="/admin/templates" class="text-zinc-400 hover:text-white transition-colors">← Back to Templates</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Template Information -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Template Information</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm text-zinc-400">Title</label>
+                            <p class="font-medium">{{ template.title }}</p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-zinc-400">Description</label>
+                            <p class="mt-1">{{ template.description }}</p>
+                        </div>
+                        {% if template.price %}
+                        <div>
+                            <label class="text-sm text-zinc-400">Price</label>
+                            <p class="font-medium text-emerald-400">${{ template.price }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Template Features -->
+                {% if template.features %}
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Features</h2>
+                    <ul class="space-y-2">
+                        {% for feature in template.features %}
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-emerald-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>{{ feature }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Actions -->
+                <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="editTemplate('{{ template.id }}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Edit Template
+                        </button>
+                        <a href="/templates/{{ template.id }}" target="_blank" class="w-full border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white py-2 px-4 rounded-lg font-medium transition-colors text-center block">
+                            View Public Page
+                        </a>
+                        <button onclick="deleteTemplate('{{ template.id }}')" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Delete Template
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Template Stats -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">Template Stats</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <label class="text-zinc-400">Created</label>
+                            <p class="font-medium">{{ template.createdAt[:19] if template.createdAt else 'N/A' }}</p>
+                        </div>
+                        {% if template.updatedAt %}
+                        <div>
+                            <label class="text-zinc-400">Last Updated</label>
+                            <p class="font-medium">{{ template.updatedAt[:19] }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editTemplate(templateId) {
+    // TODO: Implement edit functionality
+    alert('Edit functionality coming soon!');
+}
+
+function deleteTemplate(templateId) {
+    if (confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
+        fetch(`/api/admin/templates/${templateId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/admin/templates';
+            } else {
+                alert('Failed to delete template');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete template');
+        });
+    }
+}
+</script>
+{% endblock %}

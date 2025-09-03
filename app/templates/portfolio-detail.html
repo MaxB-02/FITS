@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - Portfolio - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <div class="container mx-auto px-4 py-16">
+        <div class="max-w-4xl mx-auto">
+            <!-- Back Button -->
+            <a href="/portfolio" class="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-8">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Portfolio
+            </a>
+
+            <!-- Project Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold mb-4">{{ project.title }}</h1>
+                <p class="text-xl text-zinc-300">{{ project.description }}</p>
+            </div>
+
+            <!-- Project Image -->
+            {% if project.image %}
+            <div class="mb-8">
+                <img src="{{ project.image }}" alt="{{ project.title }}" class="w-full rounded-lg">
+            </div>
+            {% endif %}
+
+            <!-- Project Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <!-- Project Description -->
+                    <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                        <h2 class="text-2xl font-semibold mb-4">Project Overview</h2>
+                        <div class="prose prose-invert max-w-none">
+                            {{ project.longDescription | safe if project.longDescription else project.description }}
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    {% if project.features %}
+                    <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                        <h2 class="text-2xl font-semibold mb-4">Key Features</h2>
+                        <ul class="space-y-2">
+                            {% for feature in project.features %}
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-emerald-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>{{ feature }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="lg:col-span-1">
+                    <!-- Project Info -->
+                    <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Project Details</h3>
+                        
+                        {% if project.technologies %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Technologies</h4>
+                            <div class="flex flex-wrap gap-2">
+                                {% for tech in project.technologies %}
+                                <span class="px-2 py-1 bg-emerald-600/20 text-emerald-400 text-sm rounded">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if project.category %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Category</h4>
+                            <p class="text-zinc-300">{{ project.category }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if project.duration %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Duration</h4>
+                            <p class="text-zinc-300">{{ project.duration }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if project.client %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Client</h4>
+                            <p class="text-zinc-300">{{ project.client }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="bg-emerald-900/20 border border-emerald-700 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">Like what you see?</h3>
+                        <p class="text-zinc-300 mb-4">Let's discuss your project requirements.</p>
+                        <a href="/inquire" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-block">
+                            Start Your Project
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

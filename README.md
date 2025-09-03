@@ -1,173 +1,215 @@
-# Freak in the Sheets - Developer Portal
+# FITS Python - Freak in the Sheets
 
-A Next.js 14 application for managing project inquiries and client projects. Built with Node.js, Tailwind CSS, and shadcn/ui components.
+A Python web application for custom automation and dashboard management, converted from Next.js to FastAPI.
 
 ## Features
 
-- **Public Inquiry Form** (`/inquire`) - Clients can submit project requests
-- **Admin Portal** (`/admin`) - Manage and review all inquiries
-- **Template Management** - Create and manage templates
-- **Portfolio Management** - Showcase completed projects
-- **Inquiry Management** - Mark inquiries as new, accepted, or declined
-- **Email Notifications** - Optional email alerts for new inquiries via Resend
-- **File-based Storage** - All data stored locally in JSON files
+- **Inquiry Management**: Handle project inquiries with file uploads
+- **Admin Dashboard**: Manage inquiries, templates, and portfolio
+- **Template System**: Create and manage project templates
+- **Portfolio Showcase**: Display completed projects
+- **Authentication**: Simple admin authentication system
+- **File Uploads**: Handle file uploads for inquiries
+- **Email Notifications**: Send email notifications for new inquiries
+
+## Technology Stack
+
+- **Backend**: FastAPI (Python)
+- **Frontend**: Jinja2 Templates + Tailwind CSS
+- **Database**: JSON file-based storage
+- **Authentication**: JWT tokens
+- **File Storage**: Local file system
+- **Email**: Resend API
 
 ## Quick Start
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) 18.0 or later
-- npm or yarn package manager
-
-### Installation
-
-1. Clone the repository
-2. Copy `env.local.sample` to `env.local` and fill in your values
-3. Install dependencies:
-```bash
-npm install
-```
-4. Run the development server:
-```bash
-npm run dev
-```
-
-The app will be available at [http://localhost:3000](http://localhost:3000).
-
-## Environment Variables
-
-Create a `.env.local` file with the following variables:
+### 1. Install Dependencies
 
 ```bash
-# NextAuth Configuration
-NEXTAUTH_SECRET=your-super-secret-key-here
-NEXTAUTH_URL=http://localhost:3000
-
-# Admin credentials
-ADMIN_USERNAME=your_admin_username
-ADMIN_PASSWORD=your_admin_password
-SESSION_SECRET=your-session-secret-key
-
-# Base URL
-BASE_URL=http://localhost:3000
-
-# Optional: Email notifications
-RESEND_API_KEY=your_resend_api_key
-BUSINESS_EMAIL=your-email@example.com
+pip install -r requirements.txt
 ```
 
-## Usage
+### 2. Set Up Environment
 
-### Public Site
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
 
-- **Homepage** (`/`) - Landing page with "Start a Project" button
-- **Templates** (`/templates`) - Browse available templates
-- **Portfolio** (`/portfolio`) - View completed projects
-- **Inquiry Form** (`/inquire`) - Project submission form for clients
-- **Thank You** (`/thank-you`) - Confirmation page after form submission
+### 3. Run the Application
 
-### Admin Portal
+```bash
+python run.py
+```
 
-- **Dashboard** (`/admin`) - Overview of all inquiries and statistics
-- **Templates** (`/admin/templates`) - Create and manage templates
-- **Portfolio** (`/admin/portfolio`) - Manage portfolio projects
-- **Inquiries** (`/admin/inquiries`) - View and manage all inquiries
-- **Inquiry Detail** (`/admin/inquiries/[id]`) - Detailed view of individual inquiries
+The application will be available at:
+- **Main Site**: http://localhost:8000
+- **Admin Panel**: http://localhost:8000/admin
+- **API Documentation**: http://localhost:8000/docs
 
-### Inquiry Management
+### 4. Default Admin Credentials
 
-Each inquiry has three possible statuses:
+- **Username**: admin
+- **Password**: admin123
 
-1. **New** - Just submitted, awaiting review
-2. **Accepted** - Approved and under development
-3. **Declined** - Not pursued
+## Project Structure
 
-Actions available:
-- **Accept** - Mark as approved
-- **Decline** - Mark as not pursued
-- **Delete** - Permanently remove
-- **View** - See full details
+```
+fits-python/
+├── app/
+│   ├── main.py              # FastAPI application
+│   ├── services/            # Business logic services
+│   ├── routes/              # API routes
+│   ├── middleware/          # Authentication middleware
+│   └── templates/           # Jinja2 HTML templates
+├── static/                  # CSS, JS, and static files
+├── data/                    # JSON database files
+├── uploads/                 # File uploads
+├── requirements.txt         # Python dependencies
+├── run.py                   # Startup script
+└── README.md               # This file
+```
 
-## Data Storage
+## API Endpoints
 
-All data is stored locally in JSON files:
-- `data/leads.json` - Project inquiries
-- `data/templates.json` - Available templates
-- `data/portfolio.json` - Portfolio projects
+### Public Endpoints
+- `GET /` - Home page
+- `GET /inquire` - Inquiry form
+- `POST /api/inquire` - Submit inquiry
+- `GET /portfolio` - Portfolio page
+- `GET /templates` - Templates page
+
+### Admin Endpoints
+- `GET /admin` - Admin dashboard
+- `GET /admin/inquiries` - Manage inquiries
+- `GET /admin/templates` - Manage templates
+- `GET /admin/portfolio` - Manage portfolio
+- `POST /login` - Admin login
+- `POST /logout` - Admin logout
+
+### API Routes
+- `GET /api/admin/inquiries` - Get all inquiries
+- `PUT /api/admin/inquiries/{id}` - Update inquiry
+- `DELETE /api/admin/inquiries/{id}` - Delete inquiry
+- `GET /api/admin/templates` - Get all templates
+- `POST /api/admin/templates` - Create template
+- `PUT /api/admin/templates/{id}` - Update template
+- `DELETE /api/admin/templates/{id}` - Delete template
+- `GET /api/admin/portfolio` - Get all portfolio projects
+- `POST /api/admin/portfolio` - Create portfolio project
+- `PUT /api/admin/portfolio/{id}` - Update portfolio project
+- `DELETE /api/admin/portfolio/{id}` - Delete portfolio project
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file with the following variables:
+
+```env
+# Admin Credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+
+# JWT Secret Key
+SECRET_KEY=your-secret-key-here
+
+# Email Configuration (optional)
+RESEND_API_KEY=your-resend-api-key
+NOTIFICATION_EMAIL=admin@yourdomain.com
+
+# Data Directory (optional)
+DATA_DIR=./data
+```
+
+### Database
+
+The application uses JSON files for data storage:
+- `data/leads.json` - Inquiry data
+- `data/templates.json` - Template data
+- `data/portfolio.json` - Portfolio data
 
 ## Development
 
-### Running the App
+### Running in Development Mode
 
 ```bash
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
+python run.py
 ```
 
-### Project Structure
+This will start the server with auto-reload enabled.
 
-```
-├── app/                    # Next.js app router pages
-│   ├── admin/            # Admin portal pages
-│   ├── api/              # API routes
-│   ├── inquire/          # Inquiry form page
-│   └── thank-you/        # Thank you page
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   └── inquiry-form.tsx  # Main inquiry form
-├── lib/                   # Utility libraries
-│   ├── auth.ts           # Authentication helpers
-│   ├── file-db.ts        # File database utilities
-│   └── inquiries.ts      # Inquiry management
-├── types/                 # TypeScript type definitions
-│   └── inquiry.ts        # Inquiry data types
-└── data/                  # Data storage
-    └── leads.json        # Inquiry data
+### Running with Uvicorn Directly
+
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-## Authentication
+### Adding New Features
 
-The admin portal uses NextAuth.js with Google OAuth. Only emails listed in `ADMIN_EMAILS` can access the admin area.
-
-## Customization
-
-### Styling
-
-The app uses Tailwind CSS with a dark zinc theme and emerald accents. Colors can be customized in the component files.
-
-### Form Fields
-
-The inquiry form fields can be modified in:
-- `types/inquiry.ts` - Data structure and validation
-- `components/inquiry-form.tsx` - Form UI and behavior
-- `app/api/inquire/route.ts` - Form processing
-
-### Email Templates
-
-Email notifications are sent via Resend. The email template can be customized in `app/api/inquire/route.ts`.
+1. **Services**: Add business logic in `app/services/`
+2. **Routes**: Add API routes in `app/routes/`
+3. **Templates**: Add HTML templates in `app/templates/`
+4. **Static Files**: Add CSS/JS in `static/`
 
 ## Deployment
 
-The app can be deployed to any platform that supports Next.js:
+### Production Deployment
 
-- Vercel (recommended)
-- Netlify
-- Railway
-- Self-hosted
+1. Set `NODE_ENV=production` in your environment
+2. Use a production WSGI server like Gunicorn with Uvicorn workers
+3. Set up a reverse proxy (nginx) for static files
+4. Configure proper file permissions for uploads directory
 
-Make sure to:
-1. Set all environment variables in production
-2. Use a strong `NEXTAUTH_SECRET`
-3. Update `NEXTAUTH_URL` to your production domain
+### Docker Deployment
+
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["python", "run.py"]
+```
+
+## Migration from Next.js
+
+This Python application is a complete conversion of the original Next.js application with the following improvements:
+
+- **Cleaner Code**: Python's syntax is more readable and maintainable
+- **Better Error Handling**: Python's exception handling is more straightforward
+- **Type Safety**: Pydantic models provide better data validation
+- **Simpler Deployment**: No build step required
+- **Better Performance**: FastAPI is extremely fast and efficient
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Port Already in Use**: Change the port in `run.py` or kill the process using port 8000
+2. **Permission Errors**: Ensure the application has write permissions to `data/` and `uploads/` directories
+3. **Import Errors**: Make sure all dependencies are installed with `pip install -r requirements.txt`
+
+### Logs
+
+The application logs to the console. For production, consider using a proper logging configuration.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
 
 ## Support
 
-For issues or questions, please check the code or create an issue in the repository. # Wed Aug 20 14:11:01 CDT 2025
-# Force Amplify deployment - Wed Aug 20 14:21:35 CDT 2025
-# Force Amplify deployment - Wed Aug 20 14:38:09 CDT 2025
+For support, please open an issue on the GitHub repository or contact the development team.

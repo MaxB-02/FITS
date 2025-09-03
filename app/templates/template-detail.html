@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}{{ template.title }} - Templates - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <div class="container mx-auto px-4 py-16">
+        <div class="max-w-4xl mx-auto">
+            <!-- Back Button -->
+            <a href="/templates" class="inline-flex items-center text-emerald-400 hover:text-emerald-300 mb-8">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Templates
+            </a>
+
+            <!-- Template Header -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold mb-4">{{ template.title }}</h1>
+                <p class="text-xl text-zinc-300">{{ template.description }}</p>
+            </div>
+
+            <!-- Template Image -->
+            {% if template.image %}
+            <div class="mb-8">
+                <img src="{{ template.image }}" alt="{{ template.title }}" class="w-full rounded-lg">
+            </div>
+            {% endif %}
+
+            <!-- Template Details -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <!-- Template Description -->
+                    <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                        <h2 class="text-2xl font-semibold mb-4">Template Overview</h2>
+                        <div class="prose prose-invert max-w-none">
+                            {{ template.longDescription | safe if template.longDescription else template.description }}
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    {% if template.features %}
+                    <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                        <h2 class="text-2xl font-semibold mb-4">What's Included</h2>
+                        <ul class="space-y-2">
+                            {% for feature in template.features %}
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-emerald-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>{{ feature }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="lg:col-span-1">
+                    <!-- Template Info -->
+                    <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                        <h3 class="text-lg font-semibold mb-4">Template Details</h3>
+                        
+                        {% if template.price %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Price</h4>
+                            <p class="text-emerald-400 font-semibold text-xl">Starting at ${{ template.price }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if template.technologies %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Technologies</h4>
+                            <div class="flex flex-wrap gap-2">
+                                {% for tech in template.technologies %}
+                                <span class="px-2 py-1 bg-emerald-600/20 text-emerald-400 text-sm rounded">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if template.category %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Category</h4>
+                            <p class="text-zinc-300">{{ template.category }}</p>
+                        </div>
+                        {% endif %}
+
+                        {% if template.estimatedTime %}
+                        <div class="mb-4">
+                            <h4 class="font-medium mb-2">Estimated Time</h4>
+                            <p class="text-zinc-300">{{ template.estimatedTime }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- CTA -->
+                    <div class="bg-emerald-900/20 border border-emerald-700 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-2">Ready to get started?</h3>
+                        <p class="text-zinc-300 mb-4">Use this template as a starting point for your project.</p>
+                        <a href="/inquire?template={{ template.id }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-block">
+                            Start with this Template
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

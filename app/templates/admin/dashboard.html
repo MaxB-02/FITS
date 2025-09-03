@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">Developer Portal Dashboard</h1>
+                    <p class="text-zinc-400">
+                        Welcome to your project inquiry and template management dashboard.
+                    </p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/logout" class="text-zinc-400 hover:text-white transition-colors">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium text-zinc-400">Total Inquiries</h3>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold">{{ stats.total }}</div>
+                <p class="text-xs text-zinc-400">All time inquiries</p>
+            </div>
+
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium text-zinc-400">New</h3>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-blue-400">{{ stats.new }}</div>
+                <p class="text-xs text-zinc-400">Awaiting review</p>
+            </div>
+
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium text-zinc-400">Accepted</h3>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-green-400">{{ stats.accepted }}</div>
+                <p class="text-xs text-zinc-400">Approved inquiries</p>
+            </div>
+
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-medium text-zinc-400">Declined</h3>
+                    <svg class="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="text-2xl font-bold text-red-400">{{ stats.declined }}</div>
+                <p class="text-xs text-zinc-400">Rejected inquiries</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold">Manage Inquiries</h3>
+                </div>
+                <p class="text-zinc-400 mb-4">Review and manage project inquiries</p>
+                <a href="/admin/inquiries" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center">
+                    View Inquiries
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold">Manage Templates</h3>
+                </div>
+                <p class="text-zinc-400 mb-4">Create and manage project templates</p>
+                <a href="/admin/templates" class="border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center">
+                    View Templates
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="bg-zinc-900 p-6 rounded-lg">
+                <div class="flex items-center mb-4">
+                    <svg class="w-5 h-5 text-emerald-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <h3 class="text-lg font-semibold">Manage Portfolio</h3>
+                </div>
+                <p class="text-zinc-400 mb-4">Showcase your completed projects</p>
+                <a href="/admin/portfolio" class="border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center">
+                    View Portfolio
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Inquiries -->
+        {% if recent_inquiries %}
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold">Recent Inquiries</h2>
+                <a href="/admin/inquiries" class="border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white px-3 py-1 rounded-lg text-sm transition-colors">
+                    View All
+                    <svg class="w-4 h-4 ml-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="space-y-3">
+                {% for inquiry in recent_inquiries %}
+                <div class="bg-zinc-900 p-4 rounded-lg">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <h3 class="font-medium">{{ inquiry.name or 'Unnamed' }}</h3>
+                            <p class="text-sm text-zinc-400">{{ inquiry.email or 'No email' }}</p>
+                            {% if inquiry.description %}
+                            <p class="text-sm text-zinc-400 mt-1">{{ inquiry.description[:100] }}{% if inquiry.description|length > 100 %}...{% endif %}</p>
+                            {% endif %}
+                        </div>
+                        <div class="text-right ml-4">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+                                {% if inquiry.status == 'new' %}bg-blue-900/50 text-blue-400
+                                {% elif inquiry.status == 'accepted' %}bg-green-900/50 text-green-400
+                                {% else %}bg-red-900/50 text-red-400{% endif %}">
+                                {{ inquiry.status or 'unknown' }}
+                            </span>
+                            <p class="text-xs text-zinc-400 mt-1">{{ inquiry.createdAt[:10] if inquiry.createdAt else 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- System Status -->
+        <div class="bg-zinc-900/50 rounded-lg p-4">
+            <h3 class="font-medium mb-2">System Status</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <span class="text-zinc-400">Database:</span>
+                    <span class="ml-2 text-green-400">✅ Operational</span>
+                </div>
+                <div>
+                    <span class="text-zinc-400">File Storage:</span>
+                    <span class="ml-2 text-green-400">✅ Operational</span>
+                </div>
+                <div>
+                    <span class="text-zinc-400">API Routes:</span>
+                    <span class="ml-2 text-green-400">✅ Operational</span>
+                </div>
+                <div>
+                    <span class="text-zinc-400">Environment:</span>
+                    <span class="ml-2 text-blue-400">Development</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

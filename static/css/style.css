@@ -1,0 +1,93 @@
+/* Custom styles for FITS Python application */
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #18181b;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #52525b;
+}
+
+/* Form focus styles */
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Button hover effects */
+.btn-primary {
+    @apply bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+.btn-secondary {
+    @apply border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white px-4 py-2 rounded-lg font-medium transition-colors;
+}
+
+/* Card hover effects */
+.card {
+    @apply bg-zinc-900 rounded-lg p-6 transition-colors;
+}
+
+.card:hover {
+    @apply bg-zinc-800;
+}
+
+/* Status badges */
+.status-new {
+    @apply bg-blue-900/50 text-blue-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-accepted {
+    @apply bg-green-900/50 text-green-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.status-declined {
+    @apply bg-red-900/50 text-red-400 px-2 py-1 rounded-full text-xs font-medium;
+}
+
+/* Loading animation */
+.loading {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Fade in animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

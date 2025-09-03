@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ inquiry.name }} - Admin - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Inquiry Details</h1>
+                <p class="text-zinc-400">Review inquiry from {{ inquiry.name }}</p>
+            </div>
+            <a href="/admin/inquiries" class="text-zinc-400 hover:text-white transition-colors">← Back to Inquiries</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Basic Information -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Basic Information</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-sm text-zinc-400">Name</label>
+                            <p class="font-medium">{{ inquiry.name or 'Not provided' }}</p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-zinc-400">Email</label>
+                            <p class="font-medium">{{ inquiry.email or 'Not provided' }}</p>
+                        </div>
+                        {% if inquiry.company %}
+                        <div>
+                            <label class="text-sm text-zinc-400">Company</label>
+                            <p class="font-medium">{{ inquiry.company }}</p>
+                        </div>
+                        {% endif %}
+                        {% if inquiry.phone %}
+                        <div>
+                            <label class="text-sm text-zinc-400">Phone</label>
+                            <p class="font-medium">{{ inquiry.phone }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Project Details -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Project Details</h2>
+                    
+                    {% if inquiry.services %}
+                    <div class="mb-4">
+                        <label class="text-sm text-zinc-400">Services Needed</label>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            {% for service in inquiry.services %}
+                            <span class="px-2 py-1 bg-emerald-600/20 text-emerald-400 text-sm rounded">{{ service }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if inquiry.description %}
+                    <div class="mb-4">
+                        <label class="text-sm text-zinc-400">Description</label>
+                        <p class="mt-1">{{ inquiry.description }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if inquiry.hasExistingSystem %}
+                    <div class="mb-4">
+                        <label class="text-sm text-zinc-400">Existing System</label>
+                        <p class="mt-1">Yes, has existing system that needs integration</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Budget & Timeline -->
+                {% if inquiry.budgetLow or inquiry.budgetHigh or inquiry.desiredDate %}
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Budget & Timeline</h2>
+                    
+                    {% if inquiry.budgetLow or inquiry.budgetHigh %}
+                    <div class="mb-4">
+                        <label class="text-sm text-zinc-400">Budget Range</label>
+                        <p class="mt-1">
+                            {% if inquiry.budgetLow and inquiry.budgetHigh %}
+                                ${{ inquiry.budgetLow }} - ${{ inquiry.budgetHigh }}
+                            {% elif inquiry.budgetLow %}
+                                Starting at ${{ inquiry.budgetLow }}
+                            {% elif inquiry.budgetHigh %}
+                                Up to ${{ inquiry.budgetHigh }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if inquiry.desiredDate %}
+                    <div class="mb-4">
+                        <label class="text-sm text-zinc-400">Desired Completion Date</label>
+                        <p class="mt-1">{{ inquiry.desiredDate }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- File Upload -->
+                {% if inquiry.filePath %}
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Uploaded Files</h2>
+                    <a href="/api/files/{{ inquiry.filePath }}" target="_blank" 
+                       class="text-emerald-400 hover:text-emerald-300 underline">
+                        Download File
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Status -->
+                <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Status</h3>
+                    <div class="mb-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                            {% if inquiry.status == 'new' %}bg-blue-900/50 text-blue-400
+                            {% elif inquiry.status == 'accepted' %}bg-green-900/50 text-green-400
+                            {% else %}bg-red-900/50 text-red-400{% endif %}">
+                            {{ inquiry.status or 'unknown' }}
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <button onclick="updateInquiryStatus('{{ inquiry.id }}', 'accepted')" 
+                                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Accept Inquiry
+                        </button>
+                        <button onclick="updateInquiryStatus('{{ inquiry.id }}', 'declined')" 
+                                class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Decline Inquiry
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">Timeline</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <label class="text-zinc-400">Created</label>
+                            <p class="font-medium">{{ inquiry.createdAt[:19] if inquiry.createdAt else 'N/A' }}</p>
+                        </div>
+                        {% if inquiry.updatedAt %}
+                        <div>
+                            <label class="text-zinc-400">Last Updated</label>
+                            <p class="font-medium">{{ inquiry.updatedAt[:19] }}</p>
+                        </div>
+                        {% endif %}
+                        {% if inquiry.reviewedAt %}
+                        <div>
+                            <label class="text-zinc-400">Reviewed</label>
+                            <p class="font-medium">{{ inquiry.reviewedAt[:19] }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateInquiryStatus(inquiryId, status) {
+    if (confirm(`Are you sure you want to ${status} this inquiry?`)) {
+        fetch(`/api/admin/inquiries/${inquiryId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: status })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to update inquiry status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update inquiry status');
+        });
+    }
+}
+</script>
+{% endblock %}

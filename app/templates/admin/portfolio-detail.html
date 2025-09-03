@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - Admin - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-zinc-950 text-zinc-100">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">Project Details</h1>
+                <p class="text-zinc-400">Manage project: {{ project.title }}</p>
+            </div>
+            <a href="/admin/portfolio" class="text-zinc-400 hover:text-white transition-colors">← Back to Portfolio</a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Project Information -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Project Information</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm text-zinc-400">Title</label>
+                            <p class="font-medium">{{ project.title }}</p>
+                        </div>
+                        <div>
+                            <label class="text-sm text-zinc-400">Description</label>
+                            <p class="mt-1">{{ project.description }}</p>
+                        </div>
+                        {% if project.category %}
+                        <div>
+                            <label class="text-sm text-zinc-400">Category</label>
+                            <p class="font-medium">{{ project.category }}</p>
+                        </div>
+                        {% endif %}
+                        {% if project.client %}
+                        <div>
+                            <label class="text-sm text-zinc-400">Client</label>
+                            <p class="font-medium">{{ project.client }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Project Image -->
+                {% if project.image %}
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Project Image</h2>
+                    <img src="{{ project.image }}" alt="{{ project.title }}" class="w-full rounded-lg">
+                </div>
+                {% endif %}
+
+                <!-- Project Features -->
+                {% if project.features %}
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h2 class="text-xl font-semibold mb-4">Key Features</h2>
+                    <ul class="space-y-2">
+                        {% for feature in project.features %}
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-emerald-400 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>{{ feature }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Actions -->
+                <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="editProject('{{ project.id }}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Edit Project
+                        </button>
+                        <a href="/portfolio/{{ project.id }}" target="_blank" class="w-full border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white py-2 px-4 rounded-lg font-medium transition-colors text-center block">
+                            View Public Page
+                        </a>
+                        <button onclick="deleteProject('{{ project.id }}')" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                            Delete Project
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project Technologies -->
+                {% if project.technologies %}
+                <div class="bg-zinc-900 p-6 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Technologies</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for tech in project.technologies %}
+                        <span class="px-2 py-1 bg-emerald-600/20 text-emerald-400 text-sm rounded">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Project Stats -->
+                <div class="bg-zinc-900 p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold mb-4">Project Stats</h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <label class="text-zinc-400">Created</label>
+                            <p class="font-medium">{{ project.createdAt[:19] if project.createdAt else 'N/A' }}</p>
+                        </div>
+                        {% if project.updatedAt %}
+                        <div>
+                            <label class="text-zinc-400">Last Updated</label>
+                            <p class="font-medium">{{ project.updatedAt[:19] }}</p>
+                        </div>
+                        {% endif %}
+                        {% if project.duration %}
+                        <div>
+                            <label class="text-zinc-400">Duration</label>
+                            <p class="font-medium">{{ project.duration }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editProject(projectId) {
+    // TODO: Implement edit functionality
+    alert('Edit functionality coming soon!');
+}
+
+function deleteProject(projectId) {
+    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+        fetch(`/api/admin/portfolio/${projectId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/admin/portfolio';
+            } else {
+                alert('Failed to delete project');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete project');
+        });
+    }
+}
+</script>
+{% endblock %}

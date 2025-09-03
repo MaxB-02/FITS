@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Templates - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="container mx-auto px-4 py-16">
+        <div class="max-w-4xl mx-auto text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">Project Templates</h1>
+            <p class="text-xl text-zinc-300">
+                Pre-built solutions to jumpstart your project
+            </p>
+        </div>
+
+        <!-- Templates Grid -->
+        {% if templates %}
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {% for template in templates %}
+                <div class="bg-zinc-900 rounded-lg overflow-hidden hover:bg-zinc-800 transition-colors">
+                    {% if template.image %}
+                    <div class="aspect-video bg-zinc-800">
+                        <img src="{{ template.image }}" alt="{{ template.title }}" class="w-full h-full object-cover">
+                    </div>
+                    {% else %}
+                    <div class="aspect-video bg-zinc-800 flex items-center justify-center">
+                        <svg class="w-12 h-12 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold mb-2">{{ template.title }}</h3>
+                        <p class="text-zinc-400 mb-4">{{ template.description[:100] }}{% if template.description|length > 100 %}...{% endif %}</p>
+                        
+                        {% if template.price %}
+                        <div class="text-emerald-400 font-semibold mb-4">Starting at ${{ template.price }}</div>
+                        {% endif %}
+                        
+                        <a href="/templates/{{ template.id }}" class="text-emerald-400 hover:text-emerald-300 font-medium">
+                            View Details →
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="max-w-2xl mx-auto text-center">
+            <div class="bg-zinc-900 p-8 rounded-lg">
+                <svg class="w-16 h-16 text-zinc-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="text-xl font-semibold mb-2">No templates yet</h3>
+                <p class="text-zinc-400">Check back soon for template updates!</p>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

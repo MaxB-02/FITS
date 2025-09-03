@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Thank You - FITS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-2xl mx-auto text-center px-4">
+        <div class="mb-8">
+            <div class="w-16 h-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold mb-4">Thank You!</h1>
+            <p class="text-xl text-zinc-300 mb-6">
+                Your inquiry has been submitted successfully. I'll review your project details and get back to you within 24 hours.
+            </p>
+        </div>
+
+        <div class="bg-zinc-900 p-6 rounded-lg mb-8">
+            <h2 class="text-lg font-semibold mb-4">What happens next?</h2>
+            <div class="space-y-3 text-left">
+                <div class="flex items-start">
+                    <div class="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        <span class="text-xs text-white font-bold">1</span>
+                    </div>
+                    <p class="text-zinc-300">I'll review your project requirements and any files you've uploaded</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        <span class="text-xs text-white font-bold">2</span>
+                    </div>
+                    <p class="text-zinc-300">I'll prepare a detailed proposal with timeline and pricing</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        <span class="text-xs text-white font-bold">3</span>
+                    </div>
+                    <p class="text-zinc-300">I'll reach out to discuss the project and answer any questions</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="/" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                Back to Home
+            </a>
+            <a href="/portfolio" class="border border-zinc-600 hover:border-zinc-500 text-zinc-300 hover:text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                View Portfolio
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
