@@ -5,7 +5,17 @@ The FITS Python application is fully converted and ready for deployment. However
 
 ## Deployment Options
 
-### Option 1: Heroku (Recommended)
+### Option 1: AWS App Runner (Recommended for AWS)
+1. **Go to AWS App Runner console**
+2. **Create service** → **Source**: GitHub
+3. **Connect your repository**: MaxB-02/FITS
+4. **Configure**:
+   - Runtime: Python 3
+   - Build command: `pip install -r requirements.txt`
+   - Start command: `python3 app.py`
+5. **Deploy automatically**
+
+### Option 2: Heroku
 1. **Install Heroku CLI**
 2. **Login to Heroku**: `heroku login`
 3. **Create Heroku app**: `heroku create fits-app`
