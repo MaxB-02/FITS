@@ -19,6 +19,7 @@ def main():
     host = os.environ.get("HOST", "0.0.0.0")
     
     print(f"🚀 Starting FITS Python Application on {host}:{port}")
+    print(f"📅 Deployment timestamp: 2025-01-09 15:30:00")
     
     uvicorn.run(
         "app.main:app",
