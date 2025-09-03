@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 # Import routes
-from .routes import admin, inquiries, templates, portfolio, auth, files, admin_inquiries
+from .routes import admin, inquiries, templates as templates_router, portfolio, auth, files, admin_inquiries
 
 # Create FastAPI app
 app = FastAPI(
@@ -36,7 +36,7 @@ app.include_router(auth.router)
 app.include_router(inquiries.router)
 app.include_router(admin.router)
 app.include_router(admin_inquiries.router)
-app.include_router(templates.router)
+app.include_router(templates_router.router)
 app.include_router(portfolio.router)
 app.include_router(files.router)
 
