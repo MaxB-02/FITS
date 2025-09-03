@@ -8,7 +8,7 @@ security = HTTPBearer()
 # Simple admin credentials (you should use environment variables in production)
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
+SECRET_KEY = os.getenv("SECRET_KEY", "fits-secret-key-2024")
 ALGORITHM = "HS256"
 
 def verify_token(token: str):

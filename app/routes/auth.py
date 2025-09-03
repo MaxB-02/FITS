@@ -12,7 +12,7 @@ templates = Jinja2Templates(directory="app/templates")
 # Simple admin credentials (you should use environment variables in production)
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
-SECRET_KEY = os.getenv("SECRET_KEY", secrets.token_urlsafe(32))
+SECRET_KEY = os.getenv("SECRET_KEY", "fits-secret-key-2024")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -47,6 +47,9 @@ async def login(
     password: str = Form(...)
 ):
     """Login endpoint"""
+    print(f"🔐 Login attempt: username='{username}', password='{password}'")
+    print(f"🔐 Expected: username='{ADMIN_USERNAME}', password='{ADMIN_PASSWORD}'")
+    
     if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
         access_token = create_access_token(data={"sub": username})
         
